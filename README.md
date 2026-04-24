@@ -1,6 +1,6 @@
-# 🧠 ToolHunter AI — Local Agent
+# 🧠 TechValidator AI — Local Agent
 
-Un Agente Autónomo de Curación de IA impulsado por **Gemini 2.5 Flash** y diseñado con una estética brutalista/editorial. 
+Un Analizador de IA impulsado por **Gemini 2.5 Flash** diseñado para validar recomendaciones tecnológicas. 
 
 ¿Cansado de guardar Reels o Shorts de YouTube sobre "Nuevas Herramientas IA" y nunca usarlos? Este agente descarga el video, lo analiza multimodalmente, investiga cada herramienta mencionada (popularidad, seguridad, pros y contras) y **te permite instalarlas con un solo clic en tu propia terminal**.
 
@@ -27,8 +27,8 @@ Este proyecto está diseñado para ejecutarse **localmente** para que el botón 
 
 ### 2. Clonar el repositorio
 ```bash
-git clone https://github.com/TU_USUARIO/toolhunter-ai.git
-cd toolhunter-ai
+git clone https://github.com/TU_USUARIO/techvalidator-ai.git
+cd techvalidator-ai
 ```
 
 ### 3. Instalar dependencias

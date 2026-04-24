@@ -188,7 +188,7 @@ app.post('/api/execute-command', (req, res) => {
 app.listen(PORT, () => {
   console.log('');
   console.log('╔══════════════════════════════════════════════╗');
-  console.log('║  🤖 TOOLHUNTER AI — Running                  ║');
+  console.log('║  🤖 TECHVALIDATOR AI — Running               ║');
   console.log(`║  📍 http://localhost:${PORT}                    ║`);
   console.log('║  📂 Upload videos or paste URLs              ║');
   console.log('║  🧠 Powered by Gemini 2.5 Flash              ║');
