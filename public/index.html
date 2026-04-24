@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IG AI Advisor — Tu Curador de Herramientas IA</title>
+  <meta name="description" content="Agente IA que analiza videos de Instagram y recomienda qué herramientas instalar." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <h1 class="display-hero">IG AI ADVISOR</h1>
+      <p>Analiza videos de Instagram, YouTube y TikTok · Investiga herramientas · Recomienda qué instalar</p>
+      <div class="badge" id="geminiStatus">GEMINI 2.0 FLASH CONECTADO</div>
+    </header>
+
+    <!-- STATS -->
+    <div class="stats" id="statsGrid">
+      <div class="stat"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Videos Analizados</div></div>
+      <div class="stat"><div class="stat-value" id="statItems">—</div><div class="stat-label">Herramientas Encontradas</div></div>
+      <div class="stat"><div class="stat-value" id="statInstall">—</div><div class="stat-label">✅ Instalar</div></div>
+      <div class="stat"><div class="stat-value" id="statSkip">—</div><div class="stat-label">❌ Saltar</div></div>
+    </div>
+
+    <!-- UPLOAD ZONE -->
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-icon">📹</div>
+      <div class="upload-title">Arrastra un video aquí o pega una URL</div>
+      <div class="upload-sub">📸 Instagram Reels · 🎬 YouTube Shorts/Videos · 🎵 TikTok · Archivos MP4/WebM/MOV (máx 200MB)</div>
+      <div class="upload-actions">
+        <button class="btn btn-primary" id="btnSelectFile">📁 Seleccionar Video</button>
+        <input type="file" id="fileInput" class="upload-file-input" accept="video/*" />
+      </div>
+      <div class="url-bar" style="margin-top: 1rem;">
+        <input type="text" class="url-input" id="urlInput" placeholder="Pega URL de Instagram, YouTube o TikTok..." />
+        <button class="btn btn-secondary" id="btnAnalyzeUrl">🔍 Analizar</button>
+      </div>
+    </div>
+
+    <!-- PROCESSING STATUS -->
+    <div id="processingStatus" style="display:none;">
+      <div class="analysis-card" style="border-color: rgba(124,58,237,0.4);">
+        <div style="padding: 1.25rem 1.5rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div class="spinner"></div>
+            <div>
+              <h3 style="font-size:1rem; font-weight:700;" id="processTitle">Analizando video...</h3>
+              <p style="font-size:0.82rem; color:var(--text-muted);" id="processDetail">Enviando video a Gemini para análisis multimodal</p>
+            </div>
+          </div>
+          <div class="progress-bar" style="margin-top:1rem;">
+            <div class="progress-fill" id="progressFill" style="width:10%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYSES LIST -->
+    <div style="margin-top: 2rem;">
+      <h2 class="section-title">📋 Análisis Realizados</h2>
+      <div class="analyses" id="analysesList">
+        <div class="empty">
+          <div class="empty-icon">🔍</div>
+          <p>Aún no hay análisis. Sube un video o pega una URL para empezar.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
