@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: techvalidator-ai-backend
+    env: docker
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # Lo pondrás tú a mano en el panel de Render

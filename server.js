@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { exec } from 'child_process';
 import { initGemini } from './lib/gemini.js';
 import {
