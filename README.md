@@ -70,4 +70,12 @@ Abre **http://localhost:3000** en tu navegador.
 - **Estética**: Figura Sonora / Renderz Studio DNA (Pure Black, Space Grotesk, Inter).
 
 ---
+
+## ☕ Apoya el Proyecto
+
+Si este agente te ha ahorrado horas de investigación, dolores de cabeza instalando librerías rotas, o simplemente te encanta la interfaz... ¡puedes invitarme a un café!
+
+[![Donar con PayPal](https://img.shields.io/badge/Donar_con-PayPal-00457C?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=takekaraka@yahoo.com&currency_code=EUR&source=url)
+
+---
 *Hecho con ⚡ para desarrolladores que valoran su tiempo y su terminal.*
