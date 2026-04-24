@@ -240,7 +240,7 @@ function renderAnalysisBody(a) {
               <code>${r.install_command_verified || t.install_command}</code>
               <div style="display:flex;gap:8px;">
                 <button onclick="copyText('${(r.install_command_verified || t.install_command).replace(/'/g, "\\'")}')">📋 Copiar</button>
-                <button id="btn-exec-${t.name.replace(/\\s+/g, '')}" onclick="executeCommand('${(r.install_command_verified || t.install_command).replace(/'/g, "\\'")}', this.id)" style="color:var(--accent);border-color:var(--accent);">⚡ Instalar</button>
+                ${(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? `<button id="btn-exec-${t.name.replace(/\\s+/g, '')}" onclick="executeCommand('${(r.install_command_verified || t.install_command).replace(/'/g, "\\'")}', this.id)" style="color:var(--accent);border-color:var(--accent);">⚡ Instalar</button>` : ''}
               </div>
             </div>
           ` : ''}
