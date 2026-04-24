@@ -1,4 +1,4 @@
-# 🧠 IG AI Advisor — Local Agent
+# 🧠 ToolHunter AI — Local Agent
 
 Un Agente Autónomo de Curación de IA impulsado por **Gemini 2.5 Flash** y diseñado con una estética brutalista/editorial. 
 
@@ -27,8 +27,8 @@ Este proyecto está diseñado para ejecutarse **localmente** para que el botón 
 
 ### 2. Clonar el repositorio
 ```bash
-git clone https://github.com/TU_USUARIO/ig-ai-advisor.git
-cd ig-ai-advisor
+git clone https://github.com/TU_USUARIO/toolhunter-ai.git
+cd toolhunter-ai
 ```
 
 ### 3. Instalar dependencias

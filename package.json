@@ -1,5 +1,5 @@
 {
-  "name": "ig-ai-advisor",
+  "name": "toolhunter-ai",
   "version": "1.0.0",
   "description": "AI Agent that analyzes Instagram saved videos about AI/coding tools and recommends what to install",
   "main": "server.js",

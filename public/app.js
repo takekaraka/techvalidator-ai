@@ -4,6 +4,7 @@
 
 const API = '';
 let polling = null;
+let lastAnalysesData = '';
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -104,7 +105,11 @@ async function loadAnalyses() {
   try {
     const res = await fetch(`${API}/api/analyses`);
     const analyses = await res.json();
-    renderAnalyses(analyses);
+    const newDataString = JSON.stringify(analyses);
+    if (newDataString !== lastAnalysesData) {
+      renderAnalyses(analyses);
+      lastAnalysesData = newDataString;
+    }
   } catch (e) { console.warn('Load error:', e); }
 }
 
@@ -127,8 +132,8 @@ function renderAnalyses(analyses) {
     const skipCount = (a.toolResearch || []).filter(t => t.research?.verdict === 'SKIP').length;
 
     return `
-      <div class="analysis-card" id="card-${a.id}">
-        <div class="analysis-header" onclick="toggleCard('${a.id}')">
+      <div class="analysis-card open" id="card-${a.id}">
+        <div class="analysis-header" onclick="toggleCard('${a.id}')" style="cursor: pointer;">
           <div class="analysis-info">
             <h3>${a.videoAnalysis?.video_summary || a.videoFilename || 'Análisis en progreso...'}</h3>
             <div class="meta">
@@ -333,7 +338,12 @@ function startPolling() {
         hideProcessing();
       }
 
-      renderAnalyses(analyses);
+      const newDataString = JSON.stringify(analyses);
+      if (newDataString !== lastAnalysesData) {
+        renderAnalyses(analyses);
+        lastAnalysesData = newDataString;
+      }
+
       loadStats();
     } catch (e) { /* silent */ }
   }, 3000);
