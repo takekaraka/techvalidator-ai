@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
+    "@xct007/frieren-scraper": "^0.0.2",
     "cors": "^2.8.6",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

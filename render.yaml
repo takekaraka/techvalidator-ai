@@ -7,3 +7,5 @@ services:
     envVars:
       - key: GEMINI_API_KEY
         sync: false # Lo pondrás tú a mano en el panel de Render
+      - key: RAPIDAPI_KEY
+        sync: false # Lo pondrás tú a mano en el panel de Render
