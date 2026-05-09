@@ -35,35 +35,32 @@
       <div class="stat"><div class="stat-value" id="statSkip">—</div><div class="stat-label">❌ Saltar</div></div>
     </div>
 
-    <!-- INSTAGRAM HELPER -->
-    <div class="notice" style="background: linear-gradient(135deg, rgba(236,72,153,0.1) 0%, rgba(168,85,247,0.15) 100%); border: 1px solid rgba(236,72,153,0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-        <span style="font-size: 1.25rem;">📸</span>
-        <strong style="color: #ec4899;">¿Quieres analizar un Reel de Instagram?</strong>
-      </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Instagram bloqueó las descargas automáticas. Sigue estos 2 pasos:</p>
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="https://snapinsta.app/es" target="_blank" class="btn btn-secondary" style="text-decoration: none; font-size: 0.85rem; padding: 0.5rem 1rem;">
-          1️⃣ Descargar Reel aquí
-        </a>
-        <span style="display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem;">→ luego súbelo abajo 👇</span>
-      </div>
-    </div>
-
-    <!-- UPLOAD ZONE -->
+    <!-- UPLOAD ZONE - SIMPLIFIED -->
     <div class="upload-zone" id="uploadZone">
       <div class="upload-icon">📹</div>
-      <div class="upload-title">Arrastra un video aquí o pega una URL</div>
-      <div class="upload-sub">🎬 YouTube Shorts/Videos · 🎵 TikTok · 📁 Subir video (MP4/WebM/MOV, máx 200MB)</div>
-      <div class="upload-actions">
+      <div class="upload-title">Sube un video para analizar</div>
+      <div class="upload-sub">Arrastra aquí o selecciona un video (MP4/WebM/MOV, máx 200MB)</div>
+      <div class="upload-actions" style="margin-top: 1rem;">
         <button class="btn btn-primary" id="btnSelectFile">📁 Seleccionar Video</button>
         <input type="file" id="fileInput" class="upload-file-input" accept="video/*" />
       </div>
-      <div class="url-bar" style="margin-top: 1rem;">
-        <input type="text" class="url-input" id="urlInput" placeholder="Pega URL de YouTube o TikTok..." />
-        <button class="btn btn-secondary" id="btnAnalyzeUrl">🔍 Analizar</button>
-      </div>
     </div>
+
+    <!-- DOWNLOAD HELPERS -->
+    <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+      <a href="https://snapinsta.app/es" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+        📸 Descargar de Instagram
+      </a>
+      <a href="https://ssyoutube.com/es" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+        🎬 Descargar de YouTube
+      </a>
+      <a href="https://snaptik.app/es" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+        🎵 Descargar de TikTok
+      </a>
+    </div>
+    <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">
+      Descarga el video con los botones de arriba → Luego súbelo aquí
+    </p>
 
     <!-- PROCESSING STATUS -->
     <div id="processingStatus" style="display:none;">
