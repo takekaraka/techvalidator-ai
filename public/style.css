@@ -17,6 +17,9 @@
   --accent-active: #b8d9ff;
   --line-subtle: rgba(232, 244, 255, 0.06);
   --line-strong: rgba(232, 244, 255, 0.15);
+  --green: #4ade80;
+  --red: #f87171;
+  --yellow: #facc15;
 
   --space-xs: 8px;
   --space-sm: 16px;
@@ -314,6 +317,8 @@ body {
   z-index: 1000; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; text-transform: uppercase;
 }
 .toast.show { transform: translateY(0); }
+.toast-success { background: var(--green); color: var(--black); }
+.toast-error { background: var(--red); color: var(--white); }
 
 @media (max-width: 768px) {
   .stats { grid-template-columns: repeat(2, 1fr); }
