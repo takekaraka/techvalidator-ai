@@ -165,9 +165,9 @@ async function analyzeUrl() {
     return;
   }
 
-  // Instagram temporarily blocked
+  // Instagram temporarily blocked - show helper
   if (url.includes('instagram.com')) {
-    showToast('Instagram bloqueado temporalmente. Usa YouTube, TikTok, o sube el video directamente.', 'error');
+    showInstagramHelper(url);
     return;
   }
 
@@ -543,6 +543,54 @@ function showToast(msg, type = '') {
   el.textContent = msg;
   el.className = `toast show ${type ? 'toast-' + type : ''}`;
   setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ── Instagram Helper Modal ──
+function showInstagramHelper(url) {
+  const downloadUrl = `https://snapinsta.app/es?url=${encodeURIComponent(url)}`;
+
+  const modal = document.createElement('div');
+  modal.id = 'igHelperModal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  `;
+
+  modal.innerHTML = `
+    <div style="background: var(--bg-card); border: 1px solid var(--line-subtle); border-radius: 16px; padding: 2rem; max-width: 420px; width: 100%; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📸</div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Instagram bloqueado temporalmente</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Instagram bloqueó las descargas automáticas. Sigue estos pasos:
+      </p>
+
+      <div style="text-align: left; background: var(--bg-hover); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <span style="background: var(--accent); color: black; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">1</span>
+          <span>Descarga el video con el botón de abajo</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="background: var(--accent); color: black; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">2</span>
+          <span>Vuelve aquí y sube el video descargado</span>
+        </div>
+      </div>
+
+      <a href="${downloadUrl}" target="_blank" class="btn btn-primary" style="display: block; text-decoration: none; margin-bottom: 0.75rem;">
+        ⬇️ Descargar Reel
+      </a>
+      <button onclick="document.getElementById('igHelperModal').remove()" class="btn btn-secondary" style="width: 100%;">
+        Cerrar
+      </button>
+    </div>
+  `;
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  document.body.appendChild(modal);
 }
 
 // ── Polling ──
