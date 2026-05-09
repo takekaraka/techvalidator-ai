@@ -1,9 +1,11 @@
 FROM node:18-bullseye-slim
 
-# Instalar Python, FFmpeg y yt-dlp (Requerido para bajar videos pesados)
-RUN apt-get update && apt-get install -y python3 python3-pip ffmpeg curl && \
-    curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
-    chmod a+rx /usr/local/bin/yt-dlp
+# Force rebuild: 2026-05-09-v2
+# Instalar Python, FFmpeg y yt-dlp
+RUN apt-get update && apt-get install -y python3 python3-pip ffmpeg curl wget && \
+    wget -q https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp && \
+    chmod a+rx /usr/local/bin/yt-dlp && \
+    /usr/local/bin/yt-dlp --version
 
 # Crear carpeta app
 WORKDIR /app
