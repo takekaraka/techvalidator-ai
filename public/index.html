@@ -35,17 +35,26 @@
       <div class="stat"><div class="stat-value" id="statSkip">—</div><div class="stat-label">❌ Saltar</div></div>
     </div>
 
+    <!-- NOTICE -->
+    <div class="notice" style="background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(251,146,60,0.1) 100%); border: 1px solid rgba(251,191,36,0.3); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+      <span style="font-size: 1.25rem;">⚠️</span>
+      <div>
+        <strong style="color: #fbbf24;">Instagram temporalmente no disponible</strong>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Instagram bloqueó todos los servicios de descarga esta semana. Usa <strong>YouTube</strong>, <strong>TikTok</strong>, o <strong>sube el video directamente</strong> (guarda el Reel en tu móvil y súbelo aquí).</p>
+      </div>
+    </div>
+
     <!-- UPLOAD ZONE -->
     <div class="upload-zone" id="uploadZone">
       <div class="upload-icon">📹</div>
       <div class="upload-title">Arrastra un video aquí o pega una URL</div>
-      <div class="upload-sub">📸 Instagram Reels · 🎬 YouTube Shorts/Videos · 🎵 TikTok · Archivos MP4/WebM/MOV (máx 200MB)</div>
+      <div class="upload-sub">🎬 YouTube Shorts/Videos · 🎵 TikTok · 📁 Subir video (MP4/WebM/MOV, máx 200MB)</div>
       <div class="upload-actions">
         <button class="btn btn-primary" id="btnSelectFile">📁 Seleccionar Video</button>
         <input type="file" id="fileInput" class="upload-file-input" accept="video/*" />
       </div>
       <div class="url-bar" style="margin-top: 1rem;">
-        <input type="text" class="url-input" id="urlInput" placeholder="Pega URL de Instagram, YouTube o TikTok..." />
+        <input type="text" class="url-input" id="urlInput" placeholder="Pega URL de YouTube o TikTok..." />
         <button class="btn btn-secondary" id="btnAnalyzeUrl">🔍 Analizar</button>
       </div>
     </div>

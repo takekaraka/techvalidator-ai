@@ -165,8 +165,14 @@ async function analyzeUrl() {
     return;
   }
 
+  // Instagram temporarily blocked
+  if (url.includes('instagram.com')) {
+    showToast('Instagram bloqueado temporalmente. Usa YouTube, TikTok, o sube el video directamente.', 'error');
+    return;
+  }
+
   if (!isValidVideoUrl(url)) {
-    showToast('URL no válida. Usa Instagram, YouTube, TikTok o un enlace directo a video.', 'error');
+    showToast('URL no válida. Usa YouTube, TikTok o sube el video directamente.', 'error');
     return;
   }
 
