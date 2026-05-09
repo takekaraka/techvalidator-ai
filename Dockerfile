@@ -1,11 +1,13 @@
 FROM node:18-bullseye-slim
 
-# Force rebuild: 2026-05-09-v2
-# Instalar Python, FFmpeg y yt-dlp
-RUN apt-get update && apt-get install -y python3 python3-pip ffmpeg curl wget && \
-    wget -q https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp && \
-    chmod a+rx /usr/local/bin/yt-dlp && \
-    /usr/local/bin/yt-dlp --version
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    ffmpeg \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir yt-dlp
 
 # Crear carpeta app
 WORKDIR /app
