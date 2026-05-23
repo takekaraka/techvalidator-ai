@@ -23,6 +23,7 @@ import {
   isDriveConnected,
   uploadClassifiedEmails,
   getRootFolderInfo,
+  exportTokensForEnv,
 } from './lib/drive.js';
 import { listRules, saveRule, deleteRule, appendHistory, getHistory } from './lib/mail-store.js';
 import { testYahooLogin } from './lib/yahoo.js';
@@ -465,6 +466,13 @@ app.get('/api/share/qr', (req, res) => {
   const target = `${proto}://${host}/inbox.html`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&margin=12&data=${encodeURIComponent(target)}`;
   res.json({ target, qr: qrUrl });
+});
+
+// GET /api/auth/google/export — exporta tokens OAuth para pegar en Render como env var
+app.get('/api/auth/google/export', (req, res) => {
+  const exp = exportTokensForEnv();
+  if (!exp) return res.status(404).json({ error: 'Drive no está conectado todavía.' });
+  res.json(exp);
 });
 
 // GET /api/drive/root — devuelve nombre + URL de la carpeta raíz de Drive

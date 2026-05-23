@@ -81,7 +81,7 @@ async function loadSetup() {
   if (!SETUP.yahoo.configured) document.getElementById('step-yahoo').open = true;
   if (!SETUP.google.connected) document.getElementById('step-google').open = true;
 
-  // Si Drive está conectado, muestra la URL de la carpeta raíz.
+  // Si Drive está conectado, muestra la URL de la carpeta raíz Y el export para Render.
   if (SETUP.google.connected) {
     try {
       const rr = await fetch('/api/drive/root');
@@ -94,6 +94,20 @@ async function loadSetup() {
         $('#driveRootCopy').onclick = () => {
           navigator.clipboard.writeText(root.url).then(() => {
             const b = $('#driveRootCopy');
+            const old = b.textContent; b.textContent = '✓ Copiado';
+            setTimeout(() => (b.textContent = old), 1400);
+          });
+        };
+      }
+      // Mostrar el "para Render" sólo si estamos viendo el callback (?connected=1) o el usuario lo abre.
+      const exp = await fetch('/api/auth/google/export').then(r => r.ok ? r.json() : null).catch(() => null);
+      const box = $('#driveExportBox');
+      if (exp && box) {
+        box.style.display = '';
+        $('#driveExportLine').textContent = exp.envLine;
+        $('#driveExportCopy').onclick = () => {
+          navigator.clipboard.writeText(exp.envLine).then(() => {
+            const b = $('#driveExportCopy');
             const old = b.textContent; b.textContent = '✓ Copiado';
             setTimeout(() => (b.textContent = old), 1400);
           });

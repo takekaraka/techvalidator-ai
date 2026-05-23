@@ -105,6 +105,15 @@
           <a id="driveRootUrl" href="#" target="_blank" rel="noopener"></a>
           <button class="btn btn-sm" id="driveRootCopy">Copiar</button>
         </div>
+        <details id="driveExportBox" style="display:none; margin-top:.5rem;" class="step-block">
+          <summary><span class="step-state">💾</span> Hacer tokens persistentes en Render</summary>
+          <p class="muted small">Render free tier reinicia el disco cada despliegue. Para no perder la sesión de Drive, pegá esto en <strong>Render → Environment → Add</strong>:</p>
+          <div class="snippet">
+            <code id="driveExportLine" style="word-break: break-all;">…</code>
+            <button class="btn btn-sm" id="driveExportCopy">Copiar</button>
+          </div>
+          <p class="muted small">Cuando Render reinicie, va a leer este `GOOGLE_TOKENS_JSON` y seguís conectado sin re-autorizar.</p>
+        </details>
       </details>
     </section>
 
