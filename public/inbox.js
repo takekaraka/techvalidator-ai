@@ -445,6 +445,32 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  // Sistema (Mac LaunchAgent)
+  fetch('/api/system/info').then(r => r.json()).then((info) => {
+    if (info.platform !== 'darwin') return;
+    $('#systemCard').style.display = '';
+    $('#systemInfo').textContent =
+      `${info.platform}/${info.arch} · usuario ${info.user} · uptime ${Math.floor(info.uptime_sec / 60)} min · LaunchAgent: ${info.launch_agent ? 'instalado ✅' : 'no instalado'}`;
+    $('#btnInstallLA').addEventListener('click', async () => {
+      setMsg('msgLA', 'Instalando…', 'info');
+      const r = await fetch('/api/system/launch-agent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'install' }),
+      }).then(r => r.json());
+      setMsg('msgLA', r.ok ? '✓ Instalado. Cada login arranca el server solo.' : '✗ ' + (r.error || 'error'), r.ok ? 'ok' : 'err');
+    });
+    $('#btnUninstallLA').addEventListener('click', async () => {
+      if (!confirm('¿Desinstalar el auto-start?')) return;
+      setMsg('msgLA', 'Desinstalando…', 'info');
+      const r = await fetch('/api/system/launch-agent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'uninstall' }),
+      }).then(r => r.json());
+      setMsg('msgLA', r.ok ? '✓ Desinstalado.' : '✗ ' + (r.error || 'error'), r.ok ? 'ok' : 'err');
+    });
+  }).catch(() => {});
+
   $('#btnSelectAll').addEventListener('click', () => {
     const checkboxes = $$('#resultsList input[type="checkbox"]');
     const allSel = checkboxes.every((c) => c.checked);

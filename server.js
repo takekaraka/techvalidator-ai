@@ -28,6 +28,7 @@ import {
 } from './lib/drive.js';
 import { listRules, saveRule, deleteRule, appendHistory, getHistory } from './lib/mail-store.js';
 import { testYahooLogin } from './lib/yahoo.js';
+import { systemInfo, installLaunchAgent, uninstallLaunchAgent, isLaunchAgentInstalled } from './lib/system.js';
 import {
   applyRuntimeConfigToEnv,
   getRuntimeConfig,
@@ -458,6 +459,19 @@ app.delete('/api/mail/rules/:id', (req, res) => {
 
 // History
 app.get('/api/mail/history', (req, res) => res.json(getHistory()));
+
+// GET /api/system/info — datos básicos del host
+app.get('/api/system/info', async (req, res) => {
+  res.json({ ...systemInfo(), launch_agent: await isLaunchAgentInstalled() });
+});
+
+// POST /api/system/launch-agent — instala/desinstala el LaunchAgent en Mac
+app.post('/api/system/launch-agent', async (req, res) => {
+  const action = req.body?.action;
+  if (action === 'install') return res.json(await installLaunchAgent());
+  if (action === 'uninstall') return res.json(await uninstallLaunchAgent());
+  res.status(400).json({ ok: false, error: 'action debe ser "install" o "uninstall"' });
+});
 
 // GET /api/diagnostics — health detallado por componente
 app.get('/api/diagnostics', async (req, res) => {

@@ -223,8 +223,21 @@
       <ol class="axes-list" id="axesList"></ol>
     </section>
 
+    <!-- ──────────────── SISTEMA ──────────────── -->
+    <section class="card" id="systemCard" style="display:none;">
+      <div class="card-head"><h2>⚙️ Esta Mac</h2></div>
+      <p class="muted small" id="systemInfo"></p>
+      <div class="actions">
+        <button class="btn btn-primary" id="btnInstallLA">Hacer permanente (auto-start)</button>
+        <button class="btn" id="btnUninstallLA">Quitar auto-start</button>
+      </div>
+      <span class="form-msg" id="msgLA"></span>
+      <p class="muted small" style="margin-top:.5rem;">"Hacer permanente" instala un LaunchAgent: cada vez que loguees en esta Mac, el server arranca solo y se reinicia si crashea. Logs en <code>~/Library/Logs/renderz-inbox.*.log</code>.</p>
+    </section>
+
     <footer class="footer">
-      <p class="muted small">Datos en disco: <code>data/google-token.json</code>, <code>data/mail-rules.json</code>, <code>data/mail-history.json</code>. Nunca se suben al repo.</p>
+      <p class="muted small">Datos en disco: <code>data/google-token.json</code>, <code>data/mail-rules.json</code>, <code>data/mail-history.json</code>, <code>data/runtime-config.json</code>. Nunca se suben al repo.</p>
+      <p class="muted small">Diagnóstico: <a href="/status.html" style="color:var(--accent);">/status.html</a> · Health: <a href="/healthz" style="color:var(--accent);">/healthz</a></p>
     </footer>
   </div>
 
