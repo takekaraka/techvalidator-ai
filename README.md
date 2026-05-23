@@ -1,5 +1,11 @@
 # Renderz Studio — AI Tools
 
+<p align="center">
+  <a href="https://render.com/deploy?repo=https://github.com/takekaraka/techvalidator-ai">
+    <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
+  </a>
+</p>
+
 Suite de dos herramientas IA bajo el mismo servidor:
 
 - **TechValidator AI** (`/validator.html`) — Analiza videos de creadores (Reels / Shorts / TikTok) y te dice qué herramientas mencionan, cuáles vale la pena instalar y cuáles no.
@@ -215,7 +221,15 @@ Powered by:
 
 ---
 
-## Arranque rápido en Mac (un solo comando)
+## Tres formas de levantarlo
+
+| Escenario | Cómo | Donde queda |
+|-----------|------|-------------|
+| **Uso casero entre tu iPad y el iPhone de Isa** | Script en Mac (LAN) | Mac de casa, accesible en la WiFi de tu hogar |
+| **Mac siempre encendida que arranca sola** | LaunchAgent (después del script) | Tu Mac, sobrevive a reinicios |
+| **Deploy público (Render) accesible desde fuera de casa** | Botón "Deploy to Render" arriba | onrender.com gratis (con Basic Auth obligatorio) |
+
+### Arranque local en Mac (un solo comando)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/takekaraka/techvalidator-ai/claude/iphone-email-classifier-drive-zfQ6j/scripts/dev-mac.sh)
@@ -228,6 +242,27 @@ caffeinate -dimsu &
 ```
 
 Una vez arriba, **toda la configuración de credenciales se hace desde la propia PWA**: abrís `http://<IP-de-la-Mac>:3000/inbox.html` en Safari y pegás Gemini key, email de Yahoo + App Password, y Google OAuth Client ID/Secret en los formularios de la sección "Guía de configuración". El servidor las persiste en `data/runtime-config.json` (gitignored) y las reinyecta como variables de entorno en caliente.
+
+### Arranque automático en cada login (LaunchAgent)
+
+Una vez clonado el repo:
+```bash
+bash scripts/install-launchagent.sh
+```
+A partir de ahí, cada vez que enciendas/loguees la Mac, el server se levanta solo. Logs en `~/Library/Logs/renderz-inbox.{out,err}.log`. Para deshabilitar: `bash scripts/uninstall-launchagent.sh`.
+
+### Deploy en Render (botón arriba)
+
+Tarda ~3 minutos. Render lee `render.yaml`, te crea el servicio y te pide rellenar las variables sensibles desde su dashboard. El `BASIC_AUTH_PASS` lo genera Render automáticamente — luego abrís el servicio → Environment → copiás la contraseña que generó. La URL pública queda en `https://renderz-studio-tools.onrender.com` (o el nombre que elijas).
+
+> ⚠️ Free tier de Render duerme tras 15 min de inactividad. La primera request del día tarda ~30s en despertar.
+
+### Compartir el acceso con otra persona (Isa)
+
+Dentro de la PWA hay un botón **"📲 Compartir con Isa"** que muestra:
+- Un **QR** generado en vivo (Isa apunta la cámara del iPhone y abre la URL en Safari).
+- Botón para abrir **WhatsApp** con un mensaje pre-formateado.
+- Botón para mandar por **mail**.
 
 ### Proteger acceso (recomendado si lo exponés a internet)
 

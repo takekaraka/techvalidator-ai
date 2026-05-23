@@ -108,6 +108,30 @@
       </details>
     </section>
 
+    <!-- ──────────────── COMPARTIR CON ISA ──────────────── -->
+    <section class="card" id="shareCard">
+      <div class="card-head">
+        <h2>📲 Compartir con Isa</h2>
+        <button class="btn-link" id="toggleShare">Mostrar QR</button>
+      </div>
+      <p class="muted small">Isa abre la cámara del iPhone, apunta al QR y se le abre Safari en esta misma URL. Si pusiste Basic Auth, le va a pedir usuario y contraseña (una vez).</p>
+      <div id="shareBox" style="display:none; margin-top:1rem;">
+        <div class="qr-row">
+          <img id="shareQR" alt="QR code" />
+          <div class="qr-side">
+            <div class="quick-link">
+              <span>URL de la PWA:</span>
+              <a id="shareUrl" href="#" target="_blank" rel="noopener"></a>
+              <button class="btn btn-sm" id="shareCopyUrl">Copiar URL</button>
+            </div>
+            <button class="btn btn-primary" id="shareWhatsApp">📩 Abrir WhatsApp con mensaje</button>
+            <button class="btn" id="shareMail">📧 Mandar por mail</button>
+            <p class="muted small" style="margin-top:.5rem;">Después le decís a Isa: <em>Compartir ⬆ → "Añadir a pantalla de inicio"</em>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ──────────────── BUSCADOR ──────────────── -->
     <section class="card">
       <div class="card-head"><h2>🔎 Clasificar</h2></div>

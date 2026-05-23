@@ -367,6 +367,31 @@ document.addEventListener('DOMContentLoaded', () => {
     checkboxes.forEach((c) => (c.checked = !allSel));
     updateUploadState();
   });
+  $('#toggleShare').addEventListener('click', async () => {
+    const box = $('#shareBox');
+    const btn = $('#toggleShare');
+    if (box.style.display === 'none') {
+      const r = await fetch('/api/share/qr');
+      const data = await r.json();
+      $('#shareQR').src = data.qr;
+      $('#shareUrl').href = data.target;
+      $('#shareUrl').textContent = data.target;
+      $('#shareCopyUrl').onclick = () => navigator.clipboard.writeText(data.target).then(() => {
+        const b = $('#shareCopyUrl'); const old = b.textContent;
+        b.textContent = '✓ Copiado'; setTimeout(() => (b.textContent = old), 1400);
+      });
+      const msg = encodeURIComponent(
+        `Hola! Abrí esto en Safari del iPhone (en WiFi de casa): ${data.target}\n\nDespués tocá Compartir ⬆ → "Añadir a pantalla de inicio" para que te quede como app.`
+      );
+      $('#shareWhatsApp').onclick = () => window.open(`https://wa.me/?text=${msg}`, '_blank');
+      $('#shareMail').onclick = () => window.location.href = `mailto:?subject=Inbox AI&body=${msg}`;
+      box.style.display = '';
+      btn.textContent = 'Ocultar QR';
+    } else {
+      box.style.display = 'none';
+      btn.textContent = 'Mostrar QR';
+    }
+  });
   $('#toggleSetup').addEventListener('click', () => {
     const card = $('#setupCard');
     const hidden = card.dataset.collapsed === '1';

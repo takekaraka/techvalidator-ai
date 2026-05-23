@@ -457,6 +457,16 @@ app.delete('/api/mail/rules/:id', (req, res) => {
 // History
 app.get('/api/mail/history', (req, res) => res.json(getHistory()));
 
+// GET /api/share/qr — genera un QR del URL público del servidor para que Isa lo escanee
+app.get('/api/share/qr', (req, res) => {
+  // Calcula la URL que ve el cliente. Si está detrás de proxy (Render) usa x-forwarded-*.
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const target = `${proto}://${host}/inbox.html`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&margin=12&data=${encodeURIComponent(target)}`;
+  res.json({ target, qr: qrUrl });
+});
+
 // GET /api/drive/root — devuelve nombre + URL de la carpeta raíz de Drive
 app.get('/api/drive/root', async (req, res) => {
   try {
