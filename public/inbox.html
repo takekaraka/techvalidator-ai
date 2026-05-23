@@ -107,6 +107,17 @@
           <a id="driveRootUrl" href="#" target="_blank" rel="noopener"></a>
           <button class="btn btn-sm" id="driveRootCopy">Copiar</button>
         </div>
+        <form class="cfg-form" id="formShareDrive" style="display:none;">
+          <label>Compartir la carpeta con otra persona (ej: el email de Isa)
+            <input type="email" id="cfgShareEmail" placeholder="isa@example.com" autocomplete="off" />
+          </label>
+          <label class="toggle-row" style="font-size:.78rem;">
+            <input type="checkbox" id="cfgShareNotify" checked />
+            Mandarle email de notificación con el link
+          </label>
+          <button type="submit" class="btn btn-primary">Compartir carpeta</button>
+          <span class="form-msg" id="msgShare"></span>
+        </form>
         <details id="driveExportBox" style="display:none; margin-top:.5rem;" class="step-block">
           <summary><span class="step-state">💾</span> Hacer tokens persistentes en Render</summary>
           <p class="muted small">Render free tier reinicia el disco cada despliegue. Para no perder la sesión de Drive, pegá esto en <strong>Render → Environment → Add</strong>:</p>

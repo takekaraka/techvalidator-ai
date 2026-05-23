@@ -81,8 +81,9 @@ async function loadSetup() {
   if (!SETUP.yahoo.configured) document.getElementById('step-yahoo').open = true;
   if (!SETUP.google.connected) document.getElementById('step-google').open = true;
 
-  // Si Drive está conectado, muestra la URL de la carpeta raíz Y el export para Render.
+  // Si Drive está conectado, muestra el form de share + URL raíz + export para Render.
   if (SETUP.google.connected) {
+    $('#formShareDrive').style.display = '';
     try {
       const rr = await fetch('/api/drive/root');
       const root = await rr.json();
@@ -387,6 +388,23 @@ async function clearYahoo() {
   loadSetup();
 }
 
+async function shareDrive(e) {
+  e.preventDefault();
+  const email = $('#cfgShareEmail').value.trim();
+  const notify = $('#cfgShareNotify').checked;
+  if (!email) return setMsg('msgShare', 'Pegá un email.', 'err');
+  setMsg('msgShare', 'Compartiendo…', 'info');
+  try {
+    const r = await fetch('/api/drive/share', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, notify }),
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Error');
+    setMsg('msgShare', `✓ Carpeta compartida con ${data.permission.emailAddress} como ${data.permission.role}. ${notify ? 'Le llegó un mail.' : ''}`, 'ok');
+  } catch (e) { setMsg('msgShare', '✗ ' + e.message, 'err'); }
+}
+
 async function saveGoogle(e) {
   e.preventDefault();
   const clientId = $('#cfgGoogleId').value.trim();
@@ -415,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#formYahoo').addEventListener('submit', saveYahoo);
   $('#btnClearYahoo').addEventListener('click', clearYahoo);
   $('#formGoogle').addEventListener('submit', saveGoogle);
+  $('#formShareDrive').addEventListener('submit', shareDrive);
 
   $('#btnSearch').addEventListener('click', doSearch);
   $('#btnUpload').addEventListener('click', doUpload);

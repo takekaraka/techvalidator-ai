@@ -24,6 +24,7 @@ import {
   uploadClassifiedEmails,
   getRootFolderInfo,
   exportTokensForEnv,
+  shareRootFolder,
 } from './lib/drive.js';
 import { listRules, saveRule, deleteRule, appendHistory, getHistory } from './lib/mail-store.js';
 import { testYahooLogin } from './lib/yahoo.js';
@@ -509,6 +510,14 @@ app.get('/api/auth/google/export', (req, res) => {
   const exp = exportTokensForEnv();
   if (!exp) return res.status(404).json({ error: 'Drive no está conectado todavía.' });
   res.json(exp);
+});
+
+// POST /api/drive/share — comparte la carpeta raíz con un email (notification opcional)
+app.post('/api/drive/share', async (req, res) => {
+  const { email, role, notify, message } = req.body || {};
+  if (!email) return res.status(400).json({ ok: false, error: 'email requerido' });
+  const r = await shareRootFolder(email.trim(), { role, notify, message });
+  res.status(r.ok ? 200 : 400).json(r);
 });
 
 // GET /api/drive/root — devuelve nombre + URL de la carpeta raíz de Drive
