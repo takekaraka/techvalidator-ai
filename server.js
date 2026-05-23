@@ -458,6 +458,42 @@ app.delete('/api/mail/rules/:id', (req, res) => {
 // History
 app.get('/api/mail/history', (req, res) => res.json(getHistory()));
 
+// GET /api/diagnostics — health detallado por componente
+app.get('/api/diagnostics', async (req, res) => {
+  const summary = configSummary();
+  const checks = {
+    gemini: { status: summary.gemini.set ? 'ok' : 'missing', detail: summary.gemini.set ? `clave ${summary.gemini.masked}` : 'sin API key — pegala en el wizard' },
+    yahoo: { status: 'unknown', detail: 'no probado' },
+    google_creds: { status: summary.google.client_id_set && summary.google.client_secret_set ? 'ok' : 'missing', detail: summary.google.redirect_uri },
+    drive_oauth: { status: isDriveConnected() ? 'ok' : 'missing', detail: isDriveConnected() ? 'conectado' : 'falta el consentimiento' },
+    basic_auth: { status: (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASS) ? 'ok' : 'warn', detail: (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASS) ? 'activo' : 'apagado (no exponer a internet sin esto)' },
+  };
+  if (summary.yahoo.set) {
+    try {
+      const t = await testYahooLogin();
+      checks.yahoo = { status: t.ok ? 'ok' : 'err', detail: t.ok ? `${t.account} (${t.total} mails)` : t.reason };
+    } catch (e) {
+      checks.yahoo = { status: 'err', detail: e.message };
+    }
+  } else {
+    checks.yahoo = { status: 'missing', detail: 'sin credenciales' };
+  }
+  res.json({ checks, summary });
+});
+
+// POST /api/classify/test — paste any email body, get classification (debug)
+app.post('/api/classify/test', async (req, res) => {
+  const { from = '', subject = '', text = '', useLLM = false } = req.body || {};
+  const fake = [{
+    uid: 'test-1',
+    from: { name: from.split('<')[0].trim() || 'Test Sender', address: (from.match(/<(.+)>/) || [, from])[1] || from || 'test@example.com' },
+    subject, text, raw: `From: ${from}\r\nSubject: ${subject}\r\n\r\n${text}`,
+    attachments: [], snippet: text.slice(0, 200), date: new Date(),
+  }];
+  const out = await classifyEmails(fake, {}, { useLLM });
+  res.json(out[0]);
+});
+
 // GET /api/share/qr — genera un QR del URL público del servidor para que Isa lo escanee
 app.get('/api/share/qr', (req, res) => {
   // Calcula la URL que ve el cliente. Si está detrás de proxy (Render) usa x-forwarded-*.

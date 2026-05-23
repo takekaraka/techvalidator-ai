@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Status — Renderz Studio</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="/icons/renderz.svg">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="inbox.css" />
+  <style>
+    .status-app { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+    .status-row-card { display: flex; justify-content: space-between; align-items: center; padding: .9rem 1rem; border-bottom: 1px solid var(--line-subtle); }
+    .status-row-card:last-child { border-bottom: 0; }
+    .status-key { color: var(--white); text-transform: uppercase; letter-spacing: 1.5px; font-size: .82rem; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+    .status-detail { color: var(--grey-text); font-size: .78rem; margin-top: 2px; font-family: ui-monospace, monospace; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: .5rem; }
+    .dot.ok { background: var(--green); box-shadow: 0 0 12px rgba(74,222,128,.4); }
+    .dot.warn { background: var(--yellow); }
+    .dot.err { background: var(--red); }
+    .dot.missing { background: var(--grey-structural); }
+    .dot.unknown { background: var(--grey-light); }
+    .refresh { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="status-app">
+    <header class="topbar">
+      <a href="/" class="back">← Inicio</a>
+      <span class="device-tag">DIAGNÓSTICO</span>
+    </header>
+    <h1 class="display-hero" style="font-size: 2rem; margin: 1rem 0;">STATUS</h1>
+    <p class="muted">Estado en vivo de cada componente. Recargá la página para revalidar.</p>
+
+    <div class="card" id="checks">Cargando…</div>
+
+    <div class="refresh">
+      <button class="btn btn-primary" id="btnReload">↻ Revalidar</button>
+      <a class="btn" href="/inbox.html">Abrir Inbox</a>
+      <a class="btn" href="/healthz" target="_blank">/healthz</a>
+    </div>
+
+    <details class="card" style="margin-top:1rem;">
+      <summary style="cursor:pointer; color: var(--white);">Detalles de configuración (masked)</summary>
+      <pre id="rawSummary" style="margin-top:.75rem; font-size:.78rem; overflow:auto;"></pre>
+    </details>
+  </div>
+
+  <script>
+    const KEYS = {
+      gemini: 'Gemini API',
+      yahoo: 'Yahoo IMAP',
+      google_creds: 'Google OAuth credentials',
+      drive_oauth: 'Google Drive (sesión)',
+      basic_auth: 'Basic Auth',
+    };
+    async function load() {
+      const target = document.getElementById('checks');
+      target.textContent = 'Cargando…';
+      try {
+        const r = await fetch('/api/diagnostics');
+        const data = await r.json();
+        target.innerHTML = '';
+        for (const [k, label] of Object.entries(KEYS)) {
+          const c = data.checks[k];
+          const div = document.createElement('div');
+          div.className = 'status-row-card';
+          div.innerHTML = `
+            <div>
+              <div><span class="dot ${c.status}"></span><span class="status-key">${label}</span></div>
+              <div class="status-detail">${c.detail}</div>
+            </div>
+            <div class="status-key" style="color: var(--accent);">${c.status.toUpperCase()}</div>`;
+          target.appendChild(div);
+        }
+        document.getElementById('rawSummary').textContent = JSON.stringify(data.summary, null, 2);
+      } catch (e) {
+        target.textContent = 'Error: ' + e.message;
+      }
+    }
+    document.getElementById('btnReload').addEventListener('click', load);
+    load();
+  </script>
+</body>
+</html>
