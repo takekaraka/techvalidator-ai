@@ -43,6 +43,13 @@
 
       <details class="step-block" id="step-gemini">
         <summary><span class="step-state">⏳</span> 1. Clave de Gemini (clasificador IA)</summary>
+        <form class="cfg-form" id="formGemini">
+          <label>API Key de Gemini
+            <input type="password" id="cfgGeminiKey" placeholder="AIza…" autocomplete="off" />
+          </label>
+          <button type="submit" class="btn btn-primary">Guardar y activar</button>
+          <span class="form-msg" id="msgGemini"></span>
+        </form>
         <ol id="stepsGemini" class="step-list"></ol>
       </details>
 
@@ -58,10 +65,19 @@
           <button class="btn btn-sm" data-copy-text="https://login.yahoo.com/account/security/app-passwords">Copiar URL</button>
         </div>
         <ol id="stepsYahoo" class="step-list"></ol>
-        <div class="snippet">
-          <code>YAHOO_EMAIL=tucuenta@yahoo.com.au<br>YAHOO_APP_PASSWORD=abcd-efgh-ijkl-mnop</code>
-          <button class="btn btn-sm" data-copy=".env">Copiar</button>
-        </div>
+        <form class="cfg-form" id="formYahoo">
+          <label>Email de Yahoo
+            <input type="email" id="cfgYahooEmail" placeholder="tucuenta@yahoo.com.au" autocomplete="off" />
+          </label>
+          <label>App Password (16 caracteres, con o sin guiones)
+            <input type="password" id="cfgYahooPass" placeholder="abcd-efgh-ijkl-mnop" autocomplete="off" />
+          </label>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">Guardar y probar conexión</button>
+            <button type="button" class="btn" id="btnClearYahoo">Borrar</button>
+          </div>
+          <span class="form-msg" id="msgYahoo"></span>
+        </form>
       </details>
 
       <details class="step-block" id="step-google">
@@ -70,6 +86,19 @@
           <strong>¿Qué permisos pide?</strong> Sólo <code>drive.file</code>: la app únicamente ve y modifica los archivos que ella misma sube. No accede al resto de tu Drive.
         </div>
         <ol id="stepsGoogle" class="step-list"></ol>
+        <form class="cfg-form" id="formGoogle">
+          <label>Client ID
+            <input type="text" id="cfgGoogleId" placeholder="xxxxx-yyyyy.apps.googleusercontent.com" autocomplete="off" />
+          </label>
+          <label>Client Secret
+            <input type="password" id="cfgGoogleSecret" placeholder="GOCSPX-…" autocomplete="off" />
+          </label>
+          <label>Redirect URI (debe coincidir con Cloud Console)
+            <input type="text" id="cfgGoogleRedirect" placeholder="http://localhost:3000/api/auth/google/callback" />
+          </label>
+          <button type="submit" class="btn">Guardar credenciales</button>
+          <span class="form-msg" id="msgGoogle"></span>
+        </form>
         <button class="btn btn-primary" id="btnConnectDrive" disabled>Conectar Google Drive</button>
         <div id="driveRootBox" class="quick-link" style="display:none; margin-top:.75rem;">
           <span>Carpeta raíz:</span>

@@ -215,6 +215,31 @@ Powered by:
 
 ---
 
+## Arranque rápido en Mac (un solo comando)
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/takekaraka/techvalidator-ai/claude/iphone-email-classifier-drive-zfQ6j/scripts/dev-mac.sh)
+```
+
+Clona o actualiza el repo, instala dependencias, crea `.env` si falta, te imprime la IP de la Mac (para conectar desde el iPad/iPhone en la misma WiFi) y arranca el servidor. Para evitar que la Mac se duerma mientras corre:
+
+```bash
+caffeinate -dimsu &
+```
+
+Una vez arriba, **toda la configuración de credenciales se hace desde la propia PWA**: abrís `http://<IP-de-la-Mac>:3000/inbox.html` en Safari y pegás Gemini key, email de Yahoo + App Password, y Google OAuth Client ID/Secret en los formularios de la sección "Guía de configuración". El servidor las persiste en `data/runtime-config.json` (gitignored) y las reinyecta como variables de entorno en caliente.
+
+### Proteger acceso (recomendado si lo exponés a internet)
+
+Añadí en `.env`:
+```
+BASIC_AUTH_USER=isa
+BASIC_AUTH_PASS=algo-largo-y-único
+```
+Reinicia. Toda la app queda detrás de Basic Auth excepto `/healthz`.
+
+---
+
 ## Inbox Classifier (Yahoo → Google Drive) — para iPhone 17
 
 Una segunda app dentro del mismo servidor: una **PWA instalable en la pantalla de inicio del iPhone 17** que busca emails en `yahoo.com.au` por *nombre, asunto, tema o palabras clave*, los clasifica en **17 ejes** con Gemini y, si se lo pides, **los sube organizados a Google Drive** (carpeta por tema + `.eml` + adjuntos).

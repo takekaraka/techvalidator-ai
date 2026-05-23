@@ -50,6 +50,12 @@ async function loadSetup() {
   const r = await fetch('/api/mail/setup-status');
   SETUP = await r.json();
 
+  // Pre-rellena el redirect URI con el origin actual (lo que ve el iPhone).
+  const redirectInput = $('#cfgGoogleRedirect');
+  if (redirectInput && !redirectInput.value) {
+    redirectInput.value = `${window.location.origin}/api/auth/google/callback`;
+  }
+
   setPill('pillGemini', SETUP.gemini.configured ? 'ok' : 'err',
     `Gemini ${SETUP.gemini.configured ? 'OK' : 'FALTA'}`);
   setPill('pillYahoo', SETUP.yahoo.configured ? 'ok' : 'warn',
@@ -273,9 +279,85 @@ function attachCopyHandlers() {
   });
 }
 
+function setMsg(id, text, kind) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'form-msg' + (kind ? ' ' + kind : '');
+}
+
+async function saveGemini(e) {
+  e.preventDefault();
+  const apiKey = $('#cfgGeminiKey').value.trim();
+  if (!apiKey) return setMsg('msgGemini', 'Pegá la API key.', 'err');
+  setMsg('msgGemini', 'Guardando…', 'info');
+  try {
+    const r = await fetch('/api/config/gemini', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey }),
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Error');
+    setMsg('msgGemini', `✓ Activada (${data.masked})`, 'ok');
+    $('#cfgGeminiKey').value = '';
+    loadSetup();
+  } catch (e) { setMsg('msgGemini', '✗ ' + e.message, 'err'); }
+}
+
+async function saveYahoo(e) {
+  e.preventDefault();
+  const email = $('#cfgYahooEmail').value.trim();
+  const appPassword = $('#cfgYahooPass').value.trim();
+  if (!email || !appPassword) return setMsg('msgYahoo', 'Email y App Password son obligatorios.', 'err');
+  setMsg('msgYahoo', 'Probando conexión con Yahoo…', 'info');
+  try {
+    const r = await fetch('/api/config/yahoo', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, appPassword }),
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Error');
+    setMsg('msgYahoo', `✓ Conectado a ${data.account} (${data.total_in_inbox} mails en INBOX)`, 'ok');
+    $('#cfgYahooPass').value = '';
+    loadSetup();
+  } catch (e) { setMsg('msgYahoo', '✗ ' + e.message, 'err'); }
+}
+
+async function clearYahoo() {
+  if (!confirm('¿Borrar credenciales de Yahoo?')) return;
+  await fetch('/api/config/yahoo', { method: 'DELETE' });
+  setMsg('msgYahoo', 'Borradas.', 'info');
+  loadSetup();
+}
+
+async function saveGoogle(e) {
+  e.preventDefault();
+  const clientId = $('#cfgGoogleId').value.trim();
+  const clientSecret = $('#cfgGoogleSecret').value.trim();
+  const redirectUri = $('#cfgGoogleRedirect').value.trim();
+  if (!clientId || !clientSecret) return setMsg('msgGoogle', 'Client ID y Secret son obligatorios.', 'err');
+  setMsg('msgGoogle', 'Guardando…', 'info');
+  try {
+    const r = await fetch('/api/config/google', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, clientSecret, redirectUri }),
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Error');
+    setMsg('msgGoogle', '✓ Credenciales guardadas. Ahora tocá "Conectar Google Drive".', 'ok');
+    $('#cfgGoogleSecret').value = '';
+    loadSetup();
+  } catch (e) { setMsg('msgGoogle', '✗ ' + e.message, 'err'); }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderAxes();
   loadSetup();
+
+  $('#formGemini').addEventListener('submit', saveGemini);
+  $('#formYahoo').addEventListener('submit', saveYahoo);
+  $('#btnClearYahoo').addEventListener('click', clearYahoo);
+  $('#formGoogle').addEventListener('submit', saveGoogle);
 
   $('#btnSearch').addEventListener('click', doSearch);
   $('#btnUpload').addEventListener('click', doUpload);

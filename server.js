@@ -25,8 +25,18 @@ import {
   getRootFolderInfo,
 } from './lib/drive.js';
 import { listRules, saveRule, deleteRule, appendHistory, getHistory } from './lib/mail-store.js';
+import { testYahooLogin } from './lib/yahoo.js';
+import {
+  applyRuntimeConfigToEnv,
+  getRuntimeConfig,
+  setRuntimeConfig,
+  clearRuntimeKey,
+  configSummary,
+} from './lib/runtime-config.js';
+import { basicAuth } from './lib/auth.js';
 
 dotenv.config();
+applyRuntimeConfigToEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +46,14 @@ const PORT = process.env.PORT || 3000;
 
 // ─── Middleware ───
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
+
+// Healthcheck SIEMPRE libre (para Render y para que el iPad pruebe conectividad).
+app.get('/healthz', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
+
+// Basic Auth opcional (si BASIC_AUTH_USER + BASIC_AUTH_PASS están definidos).
+app.use(basicAuth);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── File Upload Config ───
@@ -64,25 +81,26 @@ const upload = multer({
   },
 });
 
-// ─── Initialize Gemini ───
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey || apiKey === 'tu_clave_aqui') {
-  console.error('');
-  console.error('╔══════════════════════════════════════════════╗');
-  console.error('║  ⚠️  FALTA LA API KEY DE GEMINI              ║');
-  console.error('║                                              ║');
-  console.error('║  1. Copia .env.example a .env                ║');
-  console.error('║  2. Pega tu API Key de AI Studio             ║');
-  console.error('║  3. Reinicia el servidor                     ║');
-  console.error('╚══════════════════════════════════════════════╝');
-  console.error('');
-  process.exit(1);
+// ─── Initialize Gemini (opcional al arranque; se puede configurar después desde la UI) ───
+function bootGemini() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === 'tu_clave_aqui') {
+    console.warn('⚠️  Gemini sin configurar. Arrancando igual; configurá desde la PWA o .env y reiniciá.');
+    return false;
+  }
+  initGemini(apiKey);
+  initClassifier(apiKey);
+  console.log('✅ Gemini API inicializada');
+  return true;
 }
-initGemini(apiKey);
-initClassifier(apiKey);
-console.log('✅ Gemini API inicializada');
-console.log(`📧 Yahoo IMAP: ${hasYahooCredentials() ? 'configurado' : 'MODO MOCK (sin credenciales)'}`);
+bootGemini();
+console.log(`📧 Yahoo IMAP: ${hasYahooCredentials() ? 'configurado (' + process.env.YAHOO_EMAIL + ')' : 'MODO MOCK (sin credenciales)'}`);
 console.log(`☁️  Google Drive: ${isDriveConnected() ? 'conectado' : 'sin conectar (usa /api/auth/google)'}`);
+if (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASS) {
+  console.log(`🔒 Basic Auth activo (usuario: ${process.env.BASIC_AUTH_USER})`);
+} else {
+  console.log('🔓 Sin Basic Auth — definí BASIC_AUTH_USER y BASIC_AUTH_PASS antes de exponer a internet.');
+}
 
 // ─── Active analyses tracking (for SSE progress) ───
 const activeAnalyses = new Map();
@@ -178,6 +196,78 @@ app.get('/api/progress', (req, res) => {
   }, 2000);
 
   req.on('close', () => clearInterval(interval));
+});
+
+// ═══════════════════════════════════════════════
+// RUNTIME CONFIG (credenciales desde la PWA, sin tocar .env)
+// ═══════════════════════════════════════════════
+
+// GET /api/config — resumen masked de qué está configurado
+app.get('/api/config', (req, res) => res.json(configSummary()));
+
+// POST /api/config/gemini — guarda y reinicia Gemini en caliente
+app.post('/api/config/gemini', (req, res) => {
+  const apiKey = (req.body?.apiKey || '').trim();
+  if (!apiKey) return res.status(400).json({ ok: false, error: 'apiKey requerida' });
+  setRuntimeConfig({ GEMINI_API_KEY: apiKey });
+  try {
+    initGemini(apiKey);
+    initClassifier(apiKey);
+    res.json({ ok: true, masked: `${apiKey.slice(0,3)}…${apiKey.slice(-3)}` });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /api/config/yahoo — guarda credenciales y prueba conexión IMAP
+app.post('/api/config/yahoo', async (req, res) => {
+  const { email, appPassword, host, port } = req.body || {};
+  if (!email || !appPassword) {
+    return res.status(400).json({ ok: false, error: 'email y appPassword requeridos' });
+  }
+  const patch = {
+    YAHOO_EMAIL: email.trim(),
+    YAHOO_APP_PASSWORD: appPassword.replace(/\s+/g, ''),
+  };
+  if (host) patch.YAHOO_IMAP_HOST = host.trim();
+  if (port) patch.YAHOO_IMAP_PORT = String(port).trim();
+  setRuntimeConfig(patch);
+  // Probar conexión real.
+  const test = await testYahooLogin();
+  if (!test.ok) {
+    // No revertimos: el usuario puede haber escrito algo y querer corregir luego sin re-tipear.
+    return res.status(400).json({ ok: false, error: test.reason });
+  }
+  res.json({ ok: true, account: test.account, total_in_inbox: test.total });
+});
+
+// DELETE /api/config/yahoo — limpiar credenciales
+app.delete('/api/config/yahoo', (req, res) => {
+  clearRuntimeKey('YAHOO_EMAIL');
+  clearRuntimeKey('YAHOO_APP_PASSWORD');
+  res.json({ ok: true });
+});
+
+// POST /api/config/google — guarda Client ID + Secret + redirect URI
+app.post('/api/config/google', (req, res) => {
+  const { clientId, clientSecret, redirectUri, rootFolder } = req.body || {};
+  if (!clientId || !clientSecret) {
+    return res.status(400).json({ ok: false, error: 'clientId y clientSecret requeridos' });
+  }
+  const patch = {
+    GOOGLE_CLIENT_ID: clientId.trim(),
+    GOOGLE_CLIENT_SECRET: clientSecret.trim(),
+  };
+  if (redirectUri) patch.GOOGLE_REDIRECT_URI = redirectUri.trim();
+  if (rootFolder) patch.DRIVE_ROOT_FOLDER = rootFolder.trim();
+  setRuntimeConfig(patch);
+  res.json({ ok: true });
+});
+
+// POST /api/config/yahoo/test — prueba conexión actual sin guardar
+app.post('/api/config/yahoo/test', async (req, res) => {
+  const r = await testYahooLogin();
+  res.status(r.ok ? 200 : 400).json(r);
 });
 
 // ═══════════════════════════════════════════════
