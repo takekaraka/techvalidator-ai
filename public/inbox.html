@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Inbox Classifier — Yahoo → Drive</title>
+  <meta name="description" content="Clasifica tus emails de Yahoo con IA y súbelos a Google Drive desde el iPhone." />
+
+  <!-- PWA & iOS Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Inbox AI">
+  <meta name="theme-color" content="#080808">
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="inbox.css" />
+</head>
+<body>
+  <div class="app inbox-app">
+
+    <header class="header">
+      <div class="topbar">
+        <a href="/" class="back">← Validator</a>
+        <span class="device-tag">iPhone 17 ready</span>
+      </div>
+      <h1 class="display-hero">INBOX CLASSIFIER</h1>
+      <p>Busca en yahoo.com.au por <strong>remitente, asunto, tema o palabras clave</strong>. La IA clasifica en varios ejes y, si se lo pides, sube los emails a Google Drive en carpetas por tema.</p>
+      <div class="status-row" id="statusRow">
+        <span class="status-pill" id="pillGemini">Gemini …</span>
+        <span class="status-pill" id="pillYahoo">Yahoo …</span>
+        <span class="status-pill" id="pillDrive">Drive …</span>
+      </div>
+    </header>
+
+    <!-- ──────────────── WIZARD DE SETUP ──────────────── -->
+    <section class="card setup-card" id="setupCard">
+      <div class="card-head">
+        <h2>🧭 Guía de configuración</h2>
+        <button class="btn-link" id="toggleSetup">Ocultar</button>
+      </div>
+      <p class="muted">Si es la primera vez, sigue cada paso. Cuando una sección esté ✅ podés saltearla.</p>
+
+      <details class="step-block" id="step-gemini">
+        <summary><span class="step-state">⏳</span> 1. Clave de Gemini (clasificador IA)</summary>
+        <ol id="stepsGemini" class="step-list"></ol>
+      </details>
+
+      <details class="step-block" id="step-yahoo" open>
+        <summary><span class="step-state">⏳</span> 2. App Password de Yahoo (lectura del correo)</summary>
+        <div class="callout">
+          <strong>¿Por qué App Password y no mi contraseña?</strong><br>
+          Yahoo no deja a apps externas (como ésta) usar tu contraseña normal. Genera una clave única de 16 caracteres que sólo sirve para IMAP y podés revocar cuando quieras.
+        </div>
+        <ol id="stepsYahoo" class="step-list"></ol>
+        <div class="snippet">
+          <code>YAHOO_EMAIL=tucuenta@yahoo.com.au<br>YAHOO_APP_PASSWORD=abcd-efgh-ijkl-mnop</code>
+          <button class="btn btn-sm" data-copy=".env">Copiar</button>
+        </div>
+      </details>
+
+      <details class="step-block" id="step-google">
+        <summary><span class="step-state">⏳</span> 3. OAuth de Google Drive (para subir)</summary>
+        <div class="callout">
+          <strong>¿Qué permisos pide?</strong> Sólo <code>drive.file</code>: la app únicamente ve y modifica los archivos que ella misma sube. No accede al resto de tu Drive.
+        </div>
+        <ol id="stepsGoogle" class="step-list"></ol>
+        <button class="btn btn-primary" id="btnConnectDrive" disabled>Conectar Google Drive</button>
+      </details>
+    </section>
+
+    <!-- ──────────────── BUSCADOR ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>🔎 Clasificar</h2></div>
+      <div class="form-grid">
+        <label>Remitente (nombre o email)
+          <input type="text" id="qFrom" placeholder="ej. ATO, qantas, maria@gmail.com" />
+        </label>
+        <label>Asunto contiene
+          <input type="text" id="qSubject" placeholder="ej. factura, booking" />
+        </label>
+        <label>Tema (concepto libre)
+          <input type="text" id="qTopic" placeholder="ej. impuestos, viaje, familia" />
+        </label>
+        <label>Palabras clave (separadas por espacio)
+          <input type="text" id="qKeywords" placeholder="ej. GST ABN refund" />
+        </label>
+        <label>Antigüedad máxima
+          <select id="qSinceDays">
+            <option value="7">7 días</option>
+            <option value="14" selected>14 días</option>
+            <option value="30">30 días</option>
+            <option value="90">90 días</option>
+            <option value="365">1 año</option>
+          </select>
+        </label>
+        <label class="toggle-row">
+          <input type="checkbox" id="qLLM" checked />
+          Usar IA semántica (Gemini)
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="btnSearch">Buscar y clasificar</button>
+        <button class="btn" id="btnSelectAll" disabled>Seleccionar todo</button>
+        <button class="btn btn-accent" id="btnUpload" disabled>Subir a Drive ↑</button>
+      </div>
+      <div id="searchHint" class="muted small"></div>
+    </section>
+
+    <!-- ──────────────── RESULTADOS ──────────────── -->
+    <section id="resultsSection" class="card" style="display:none;">
+      <div class="card-head">
+        <h2>📬 Resultados <span id="resultsCount" class="muted small"></span></h2>
+        <div class="legend">
+          <span class="chip chip-red">Alta urgencia</span>
+          <span class="chip chip-yellow">Acción requerida</span>
+          <span class="chip chip-green">Factura/Receipt</span>
+        </div>
+      </div>
+      <ul id="resultsList" class="results"></ul>
+    </section>
+
+    <!-- ──────────────── EJES DE CLASIFICACIÓN ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>🧠 Ejes de clasificación que usa este sistema</h2></div>
+      <p class="muted">No es un filtro de palabras. Cada email se evalúa contra <strong>17 dimensiones</strong>. Una herramienta típica de mail rules solo cubre 2–3 (remitente + asunto).</p>
+      <ol class="axes-list" id="axesList"></ol>
+    </section>
+
+    <footer class="footer">
+      <p class="muted small">Datos en disco: <code>data/google-token.json</code>, <code>data/mail-rules.json</code>, <code>data/mail-history.json</code>. Nunca se suben al repo.</p>
+    </footer>
+  </div>
+
+  <script src="inbox.js"></script>
+</body>
+</html>
