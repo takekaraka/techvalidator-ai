@@ -1,7 +1,7 @@
 {
   "name": "techvalidator-ai",
   "version": "1.1.0",
-  "description": "AI Agent that analyzes Instagram videos AND classifies Yahoo emails into Google Drive (iPhone-ready PWA)",
+  "description": "Renderz Studio — AI tools suite: video creator analyzer (TechValidator) + Yahoo email classifier into Google Drive (Inbox Classifier). iPhone-ready PWAs.",
   "main": "server.js",
   "type": "module",
   "scripts": {

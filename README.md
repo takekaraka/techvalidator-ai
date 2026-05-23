@@ -1,4 +1,15 @@
-# TechValidator AI
+# Renderz Studio — AI Tools
+
+Suite de dos herramientas IA bajo el mismo servidor:
+
+- **TechValidator AI** (`/validator.html`) — Analiza videos de creadores (Reels / Shorts / TikTok) y te dice qué herramientas mencionan, cuáles vale la pena instalar y cuáles no.
+- **Inbox Classifier** (`/inbox.html`) — Busca en `yahoo.com.au` por remitente / asunto / tema / keywords, clasifica los emails en 17 ejes con Gemini, y los sube a Google Drive en carpetas por tema.
+
+Página de inicio (`/`) es un hub con tarjetas para entrar a cada una.
+
+---
+
+## TechValidator AI (legacy)
 
 <p align="center">
   <img src="https://img.shields.io/badge/Gemini_2.5-Powered-blue?style=for-the-badge&logo=google" alt="Gemini Powered">
