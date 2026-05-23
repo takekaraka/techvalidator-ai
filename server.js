@@ -22,6 +22,7 @@ import {
   handleOAuthCallback,
   isDriveConnected,
   uploadClassifiedEmails,
+  getRootFolderInfo,
 } from './lib/drive.js';
 import { listRules, saveRule, deleteRule, appendHistory, getHistory } from './lib/mail-store.js';
 
@@ -189,36 +190,42 @@ app.get('/api/mail/setup-status', (req, res) => {
     yahoo: {
       configured: hasYahooCredentials(),
       account: process.env.YAHOO_EMAIL || null,
+      direct_url: 'https://login.yahoo.com/account/security/app-passwords',
       steps: [
         {
           n: 1,
-          title: 'Entra a tu cuenta de Yahoo',
-          detail: 'Abre https://login.yahoo.com con tu email yahoo.com.au y haz login.',
+          title: 'Atajo directo (recomendado en iPhone)',
+          detail: 'Abre Safari y ve a https://login.yahoo.com/account/security/app-passwords — esta URL te lleva DIRECTO a la pantalla de contraseñas de aplicación, saltando todo el menú. Inicia sesión si te lo pide.',
         },
         {
           n: 2,
-          title: 'Ve a Seguridad de la cuenta',
-          detail: 'En el menú superior derecho → Información de la cuenta → Seguridad de la cuenta. URL directa: https://login.yahoo.com/account/security',
+          title: 'Si el atajo te muestra "no disponible": activa la verificación en dos pasos',
+          detail: 'Yahoo sólo deja generar App Passwords con 2FA activado. Ve a https://login.yahoo.com/account/security → sección "Verificación en dos pasos" → Activar. Te pedirá un número de móvil para SMS o una app autenticadora. Cuando termines, vuelve al paso 1.',
         },
         {
           n: 3,
-          title: 'Activa la verificación en dos pasos (si no la tienes)',
-          detail: 'Yahoo solo permite generar App Passwords con 2FA activado.',
+          title: 'Camino largo si preferís navegar a mano',
+          detail: 'En login.yahoo.com → icono de tu perfil arriba a la derecha → "Información de la cuenta" → menú lateral "Seguridad de la cuenta" → desplázate hasta "Otras formas de iniciar sesión" → "Generar y administrar contraseñas de aplicación". En la app móvil de Yahoo Mail es: foto de perfil → "Administrar cuentas" → tu cuenta → "Información de la cuenta" → "Seguridad".',
         },
         {
           n: 4,
-          title: 'Crea una "Contraseña de aplicación"',
-          detail: 'Pulsa "Generar y administrar contraseñas de aplicación" → Escribe un nombre (ej. "TechValidator AI") → Generar.',
+          title: 'Genera la contraseña de aplicación',
+          detail: 'Pulsa "Generar contraseña de aplicación" (a veces aparece como "Get app password" / "Add app password"). Yahoo te pide un nombre descriptivo: escribe "TechValidator AI" → Generar / Create.',
         },
         {
           n: 5,
-          title: 'Copia la contraseña (16 caracteres)',
-          detail: 'Yahoo te muestra la contraseña UNA SOLA VEZ. Cópiala entera con los guiones (ej. abcd-efgh-ijkl-mnop).',
+          title: 'Copia la contraseña de 16 caracteres',
+          detail: 'Yahoo te muestra la contraseña UNA SOLA VEZ en formato xxxx-xxxx-xxxx-xxxx (con guiones). Pulsa el icono de copiar o selecciónala manualmente. Si la cierras sin copiarla, tendrás que borrarla y generar otra.',
         },
         {
           n: 6,
-          title: 'Pégala en tu archivo .env',
-          detail: 'En la raíz del proyecto: YAHOO_EMAIL=tucuenta@yahoo.com.au y YAHOO_APP_PASSWORD=abcd-efgh-ijkl-mnop. Después reinicia el servidor.',
+          title: 'Pégala en .env y reinicia',
+          detail: 'En la raíz del proyecto edita .env: YAHOO_EMAIL=tucuenta@yahoo.com.au y YAHOO_APP_PASSWORD=abcd-efgh-ijkl-mnop (con los guiones). Después: detené el servidor (Ctrl+C) y npm start de nuevo. Esta página detecta el cambio y el pill "Yahoo" se pondrá verde.',
+        },
+        {
+          n: 7,
+          title: 'Cómo revocarla si querés cortarle el acceso',
+          detail: 'Volvé a la misma pantalla (paso 1) → al lado del nombre "TechValidator AI" pulsá "Eliminar". Quedará invalidada al instante; ningún App Password puede iniciar sesión interactiva, sólo IMAP/SMTP, así que es seguro.',
         },
       ],
     },
@@ -359,6 +366,15 @@ app.delete('/api/mail/rules/:id', (req, res) => {
 
 // History
 app.get('/api/mail/history', (req, res) => res.json(getHistory()));
+
+// GET /api/drive/root — devuelve nombre + URL de la carpeta raíz de Drive
+app.get('/api/drive/root', async (req, res) => {
+  try {
+    res.json(await getRootFolderInfo());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Google OAuth flow
 app.get('/api/auth/google', (req, res) => {

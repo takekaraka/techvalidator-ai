@@ -74,6 +74,27 @@ async function loadSetup() {
   if (!SETUP.gemini.configured) document.getElementById('step-gemini').open = true;
   if (!SETUP.yahoo.configured) document.getElementById('step-yahoo').open = true;
   if (!SETUP.google.connected) document.getElementById('step-google').open = true;
+
+  // Si Drive está conectado, muestra la URL de la carpeta raíz.
+  if (SETUP.google.connected) {
+    try {
+      const rr = await fetch('/api/drive/root');
+      const root = await rr.json();
+      if (root.url) {
+        $('#driveRootBox').style.display = '';
+        const a = $('#driveRootUrl');
+        a.href = root.url;
+        a.textContent = `${root.name} — ${root.url}`;
+        $('#driveRootCopy').onclick = () => {
+          navigator.clipboard.writeText(root.url).then(() => {
+            const b = $('#driveRootCopy');
+            const old = b.textContent; b.textContent = '✓ Copiado';
+            setTimeout(() => (b.textContent = old), 1400);
+          });
+        };
+      }
+    } catch (_) { /* silencioso */ }
+  }
 }
 
 function renderAxes() {
@@ -174,6 +195,49 @@ async function doSearch() {
   }
 }
 
+function renderDriveFolders(data) {
+  const section = $('#driveFoldersSection');
+  const list = $('#driveFoldersList');
+  const hint = $('#driveFoldersHint');
+  list.innerHTML = '';
+
+  const counts = data.uploaded.reduce((acc, u) => {
+    acc[u.topic] = (acc[u.topic] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Carpeta raíz arriba.
+  if (data.root) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="topic-name">📂 RAÍZ — ${escapeHtml(data.root.name)}</span>
+      <a class="folder-url" href="${escapeHtml(data.root.url)}" target="_blank" rel="noopener">${escapeHtml(data.root.url)}</a>
+      <button class="btn btn-sm" data-copy-text="${escapeHtml(data.root.url)}">Copiar</button>
+      ${data.root.url.startsWith('http') ? `<a class="btn btn-sm" href="${escapeHtml(data.root.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}
+    `;
+    list.appendChild(li);
+  }
+
+  for (const f of data.folders || []) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="topic-name">${escapeHtml(f.topic)}</span>
+      <a class="folder-url" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.url)}</a>
+      <span class="count">${counts[f.topic] || 0} email${counts[f.topic] === 1 ? '' : 's'}</span>
+      <button class="btn btn-sm" data-copy-text="${escapeHtml(f.url)}">Copiar</button>
+      ${f.url.startsWith('http') ? `<a class="btn btn-sm" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">Abrir</a>` : ''}
+    `;
+    list.appendChild(li);
+  }
+
+  hint.textContent = data.mock
+    ? '⚠️ Modo MOCK — las rutas mostradas son simuladas. Conectá Drive para obtener URLs reales.'
+    : 'Tocá "Copiar" para llevarte el enlace a otra app, o "Abrir" para verlo en Drive.';
+  section.style.display = data.uploaded.length ? 'block' : 'none';
+  attachCopyHandlers();
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 async function doUpload() {
   const idxs = selectedIndices();
   if (!idxs.length) return;
@@ -188,13 +252,25 @@ async function doUpload() {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || 'Error');
-    const lines = data.uploaded.map((u) => `• ${u.topic}/ → ${u.eml?.name || u.emlPath}`).join('\n');
-    alert(`${data.mock ? '(MOCK) ' : ''}Subidos ${data.uploaded.length} emails:\n\n${lines}`);
+    renderDriveFolders(data);
   } catch (e) {
     alert('Error subiendo: ' + e.message);
   } finally {
     updateUploadState();
   }
+}
+
+function attachCopyHandlers() {
+  $$('[data-copy-text]').forEach((b) => {
+    if (b.dataset.bound) return;
+    b.dataset.bound = '1';
+    b.addEventListener('click', () => {
+      const txt = b.dataset.copyText;
+      navigator.clipboard.writeText(txt).then(() => {
+        const old = b.textContent; b.textContent = '✓ Copiado'; setTimeout(() => (b.textContent = old), 1400);
+      });
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -224,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+  attachCopyHandlers();
 
   // Si volvemos de OAuth, recargamos status.
   if (location.search.includes('connected=1')) {

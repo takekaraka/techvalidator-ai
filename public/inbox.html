@@ -52,6 +52,11 @@
           <strong>¿Por qué App Password y no mi contraseña?</strong><br>
           Yahoo no deja a apps externas (como ésta) usar tu contraseña normal. Genera una clave única de 16 caracteres que sólo sirve para IMAP y podés revocar cuando quieras.
         </div>
+        <div class="quick-link" id="yahooQuickLink">
+          <span>Atajo directo:</span>
+          <a href="https://login.yahoo.com/account/security/app-passwords" target="_blank" rel="noopener" id="yahooDirectUrl">login.yahoo.com/account/security/app-passwords</a>
+          <button class="btn btn-sm" data-copy-text="https://login.yahoo.com/account/security/app-passwords">Copiar URL</button>
+        </div>
         <ol id="stepsYahoo" class="step-list"></ol>
         <div class="snippet">
           <code>YAHOO_EMAIL=tucuenta@yahoo.com.au<br>YAHOO_APP_PASSWORD=abcd-efgh-ijkl-mnop</code>
@@ -66,6 +71,11 @@
         </div>
         <ol id="stepsGoogle" class="step-list"></ol>
         <button class="btn btn-primary" id="btnConnectDrive" disabled>Conectar Google Drive</button>
+        <div id="driveRootBox" class="quick-link" style="display:none; margin-top:.75rem;">
+          <span>Carpeta raíz:</span>
+          <a id="driveRootUrl" href="#" target="_blank" rel="noopener"></a>
+          <button class="btn btn-sm" id="driveRootCopy">Copiar</button>
+        </div>
       </details>
     </section>
 
@@ -105,6 +115,13 @@
         <button class="btn btn-accent" id="btnUpload" disabled>Subir a Drive ↑</button>
       </div>
       <div id="searchHint" class="muted small"></div>
+    </section>
+
+    <!-- ──────────────── CARPETAS DE DRIVE (tras subir) ──────────────── -->
+    <section id="driveFoldersSection" class="card" style="display:none;">
+      <div class="card-head"><h2>📁 Carpetas en Drive</h2></div>
+      <p class="muted small" id="driveFoldersHint"></p>
+      <ul id="driveFoldersList" class="folders-list"></ul>
     </section>
 
     <!-- ──────────────── RESULTADOS ──────────────── -->

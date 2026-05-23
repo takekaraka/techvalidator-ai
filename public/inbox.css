@@ -134,3 +134,32 @@
 
 .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line-subtle); }
 .footer code { background: var(--black); padding: 1px 6px; border-radius: 2px; }
+
+.quick-link {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  background: rgba(232,244,255,.04); border: 1px solid var(--line-strong);
+  padding: .5rem .65rem; margin: .5rem 0; border-radius: 3px;
+  font-size: .85rem;
+}
+.quick-link span { color: var(--grey-text); text-transform: uppercase; letter-spacing: 1px; font-size: .7rem; }
+.quick-link a { color: var(--accent); text-decoration: none; word-break: break-all; font-family: ui-monospace, monospace; flex: 1 1 220px; }
+.quick-link a:hover { text-decoration: underline; }
+
+.folders-list { list-style: none; padding: 0; margin: 0; }
+.folders-list li {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  border: 1px solid var(--line-subtle); background: var(--dark-mid);
+  padding: .65rem .8rem; margin-bottom: .5rem; border-radius: 3px;
+}
+.folders-list .topic-name {
+  color: var(--white); font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; font-size: .82rem;
+  flex: 0 0 auto;
+}
+.folders-list .folder-url {
+  color: var(--accent); text-decoration: none;
+  font-family: ui-monospace, monospace; font-size: .78rem;
+  word-break: break-all; flex: 1 1 200px;
+}
+.folders-list .folder-url:hover { text-decoration: underline; }
+.folders-list .count { color: var(--grey-text); font-size: .72rem; }
