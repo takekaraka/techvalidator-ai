@@ -435,6 +435,25 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#formGoogle').addEventListener('submit', saveGoogle);
   $('#formShareDrive').addEventListener('submit', shareDrive);
 
+  $('#btnRestore').addEventListener('click', () => $('#restoreFile').click());
+  $('#restoreFile').addEventListener('change', async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setMsg('msgRestore', 'Cargando archivo…', 'info');
+    try {
+      const text = await f.text();
+      const json = JSON.parse(text);
+      const r = await fetch('/api/config/restore', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(json),
+      });
+      const data = await r.json();
+      if (!data.ok) throw new Error(data.error || 'Error');
+      setMsg('msgRestore', `✓ Restaurado: ${data.restored_keys.length} claves${data.drive ? ' + tokens Drive' : ''}. Recargá la página.`, 'ok');
+      setTimeout(() => location.reload(), 1500);
+    } catch (e) { setMsg('msgRestore', '✗ ' + e.message, 'err'); }
+  });
+
   $('#btnSearch').addEventListener('click', doSearch);
   $('#btnUpload').addEventListener('click', doUpload);
   $('#btnSearchAndUpload').addEventListener('click', doSearchAndUploadAll);

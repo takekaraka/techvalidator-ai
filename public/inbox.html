@@ -223,6 +223,18 @@
       <ol class="axes-list" id="axesList"></ol>
     </section>
 
+    <!-- ──────────────── BACKUP/RESTORE ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>💾 Backup / Restore</h2></div>
+      <p class="muted small">Descargá un archivo con toda tu configuración (Gemini, OAuth Google, App Password de Yahoo, tokens Drive). Sirve para migrar a otra Mac o a Render sin re-tipear.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/api/config/backup" download>📥 Descargar backup</a>
+        <button class="btn" id="btnRestore">📤 Restaurar desde archivo</button>
+        <input type="file" id="restoreFile" accept="application/json" style="display:none;" />
+      </div>
+      <span class="form-msg" id="msgRestore"></span>
+    </section>
+
     <!-- ──────────────── SISTEMA ──────────────── -->
     <section class="card" id="systemCard" style="display:none;">
       <div class="card-head"><h2>⚙️ Esta Mac</h2></div>

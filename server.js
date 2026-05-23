@@ -35,6 +35,8 @@ import {
   setRuntimeConfig,
   clearRuntimeKey,
   configSummary,
+  backupConfig,
+  restoreConfig,
 } from './lib/runtime-config.js';
 import { basicAuth } from './lib/auth.js';
 
@@ -265,6 +267,30 @@ app.post('/api/config/google', (req, res) => {
   if (rootFolder) patch.DRIVE_ROOT_FOLDER = rootFolder.trim();
   setRuntimeConfig(patch);
   res.json({ ok: true });
+});
+
+// GET /api/config/backup — descarga JSON con toda la config + tokens Drive
+app.get('/api/config/backup', (req, res) => {
+  const data = backupConfig();
+  const fname = `renderz-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  res.set('Content-Disposition', `attachment; filename="${fname}"`);
+  res.set('Content-Type', 'application/json');
+  res.send(JSON.stringify(data, null, 2));
+});
+
+// POST /api/config/restore — restaura desde un backup pegado/subido
+app.post('/api/config/restore', (req, res) => {
+  try {
+    const r = restoreConfig(req.body);
+    // Recargar Gemini si se restauró key.
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'tu_clave_aqui') {
+      initGemini(process.env.GEMINI_API_KEY);
+      initClassifier(process.env.GEMINI_API_KEY);
+    }
+    res.json({ ok: true, ...r });
+  } catch (e) {
+    res.status(400).json({ ok: false, error: e.message });
+  }
 });
 
 // POST /api/config/yahoo/test — prueba conexión actual sin guardar
