@@ -135,6 +135,25 @@
 .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line-subtle); }
 .footer code { background: var(--black); padding: 1px 6px; border-radius: 2px; }
 
+.input-with-mic {
+  display: grid; grid-template-columns: 1fr auto; gap: .4rem; align-items: stretch;
+}
+.input-with-mic input { width: 100%; }
+.mic-btn {
+  background: var(--black); border: 1px solid var(--line-subtle);
+  color: var(--accent); padding: .55rem .75rem; cursor: pointer; border-radius: 2px;
+  font-size: 1.2rem; line-height: 1;
+}
+.mic-btn:hover { background: var(--graphite); }
+.mic-btn.listening {
+  background: var(--accent); color: var(--black);
+  animation: pulse 1.4s ease-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
 .qr-row {
   display: grid; gap: 1rem;
   grid-template-columns: auto 1fr; align-items: start;

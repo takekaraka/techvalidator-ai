@@ -279,6 +279,49 @@ function attachCopyHandlers() {
   });
 }
 
+function setupVoiceInput(micSel, targetSel) {
+  const micBtn = document.querySelector(micSel);
+  const target = document.querySelector(targetSel);
+  if (!micBtn || !target) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { micBtn.disabled = true; micBtn.title = 'Tu navegador no soporta dictado'; return; }
+  let rec = null;
+  let listening = false;
+  micBtn.addEventListener('click', () => {
+    if (listening) { rec?.stop(); return; }
+    rec = new SR();
+    rec.lang = 'es-ES';
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onstart = () => { listening = true; micBtn.classList.add('listening'); micBtn.textContent = '⏺'; };
+    rec.onresult = (e) => {
+      const text = e.results[0][0].transcript.trim();
+      if (text) target.value = (target.value ? target.value + ' ' : '') + text;
+    };
+    rec.onerror = () => {};
+    rec.onend = () => { listening = false; micBtn.classList.remove('listening'); micBtn.textContent = '🎙️'; };
+    try { rec.start(); } catch (_) { /* already started */ }
+  });
+}
+
+async function doSearchAndUploadAll() {
+  $('#btnSearchAndUpload').disabled = true;
+  $('#btnSearchAndUpload').textContent = 'Buscando…';
+  await doSearch();
+  if (!LAST_RESULTS.length) {
+    $('#btnSearchAndUpload').disabled = false;
+    $('#btnSearchAndUpload').textContent = '⚡ Buscar y subir todo';
+    return;
+  }
+  // Marca todos
+  $$('#resultsList input[type="checkbox"]').forEach((c) => (c.checked = true));
+  updateUploadState();
+  $('#btnSearchAndUpload').textContent = `Subiendo ${LAST_RESULTS.length}…`;
+  await doUpload();
+  $('#btnSearchAndUpload').disabled = false;
+  $('#btnSearchAndUpload').textContent = '⚡ Buscar y subir todo';
+}
+
 function setMsg(id, text, kind) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -361,6 +404,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('#btnSearch').addEventListener('click', doSearch);
   $('#btnUpload').addEventListener('click', doUpload);
+  $('#btnSearchAndUpload').addEventListener('click', doSearchAndUploadAll);
+
+  setupVoiceInput('#micKeywords', '#qKeywords');
+
+  // Register service worker para que la PWA funcione offline.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
   $('#btnSelectAll').addEventListener('click', () => {
     const checkboxes = $$('#resultsList input[type="checkbox"]');
     const allSel = checkboxes.every((c) => c.checked);
