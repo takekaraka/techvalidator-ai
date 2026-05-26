@@ -91,7 +91,8 @@ async function loadSetup() {
         $('#driveRootBox').style.display = '';
         const a = $('#driveRootUrl');
         a.href = root.url;
-        a.textContent = `${root.name} — ${root.url}`;
+        const cacheTag = root.cached ? ' (cacheado, server reiniciado)' : '';
+        a.textContent = `${root.name} — ${root.url}${cacheTag}`;
         $('#driveRootCopy').onclick = () => {
           navigator.clipboard.writeText(root.url).then(() => {
             const b = $('#driveRootCopy');
