@@ -1,11 +1,35 @@
 services:
   - type: web
-    name: techvalidator-ai-backend
+    name: renderz-studio-tools
     env: docker
     plan: free
     region: frankfurt
+    branch: main
+    healthCheckPath: /healthz
     envVars:
+      # ─── Gemini (clasificador IA) ───
       - key: GEMINI_API_KEY
-        sync: false # Lo pondrás tú a mano en el panel de Render
-      - key: RAPIDAPI_KEY
-        sync: false # Lo pondrás tú a mano en el panel de Render
+        sync: false # Pegalo desde el panel: AI Studio → Create API key
+      # ─── Yahoo IMAP (la cuenta de Isa) ───
+      - key: YAHOO_EMAIL
+        sync: false # ej: isa@yahoo.com.au
+      - key: YAHOO_APP_PASSWORD
+        sync: false # 16 chars con guiones desde login.yahoo.com/account/security/app-passwords
+      - key: YAHOO_IMAP_HOST
+        value: imap.mail.yahoo.com
+      - key: YAHOO_IMAP_PORT
+        value: "993"
+      # ─── Google Drive OAuth (tu cuenta) ───
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false # ej: https://renderz-studio-tools.onrender.com/api/auth/google/callback
+      - key: DRIVE_ROOT_FOLDER
+        value: Inbox-Classified
+      # ─── Basic Auth (OBLIGATORIO en producción) ───
+      - key: BASIC_AUTH_USER
+        sync: false
+      - key: BASIC_AUTH_PASS
+        generateValue: true # Render genera un valor random fuerte automáticamente

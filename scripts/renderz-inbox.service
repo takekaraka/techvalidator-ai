@@ -1,0 +1,15 @@
+[Unit]
+Description=Renderz Studio Inbox AI
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/techvalidator-ai
+ExecStart=/usr/bin/env node %h/techvalidator-ai/server.js
+Restart=always
+RestartSec=3
+StandardOutput=append:%h/renderz-inbox.log
+StandardError=append:%h/renderz-inbox.err.log
+
+[Install]
+WantedBy=default.target

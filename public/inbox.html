@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Inbox Classifier — Yahoo → Drive</title>
+  <meta name="description" content="Clasifica tus emails de Yahoo con IA y súbelos a Google Drive desde el iPhone." />
+
+  <!-- PWA & iOS Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Inbox AI">
+  <meta name="theme-color" content="#080808">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="/icons/inbox.svg">
+  <link rel="icon" type="image/svg+xml" href="/icons/inbox.svg">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="inbox.css" />
+</head>
+<body>
+  <div class="app inbox-app">
+
+    <header class="header">
+      <div class="topbar">
+        <a href="/" class="back">← Inicio</a>
+        <span class="device-tag">iPhone 17 ready</span>
+      </div>
+      <h1 class="display-hero">INBOX CLASSIFIER</h1>
+      <p>Busca en yahoo.com.au por <strong>remitente, asunto, tema o palabras clave</strong>. La IA clasifica en varios ejes y, si se lo pides, sube los emails a Google Drive en carpetas por tema.</p>
+      <div class="status-row" id="statusRow">
+        <span class="status-pill" id="pillGemini">Gemini …</span>
+        <span class="status-pill" id="pillYahoo">Yahoo …</span>
+        <span class="status-pill" id="pillDrive">Drive …</span>
+      </div>
+    </header>
+
+    <!-- ──────────────── WIZARD DE SETUP ──────────────── -->
+    <section class="card setup-card" id="setupCard">
+      <div class="card-head">
+        <h2>🧭 Guía de configuración</h2>
+        <button class="btn-link" id="toggleSetup">Ocultar</button>
+      </div>
+      <p class="muted">Si es la primera vez, sigue cada paso. Cuando una sección esté ✅ podés saltearla.</p>
+
+      <details class="step-block" id="step-gemini">
+        <summary><span class="step-state">⏳</span> 1. Clave de Gemini (clasificador IA)</summary>
+        <form class="cfg-form" id="formGemini">
+          <label>API Key de Gemini
+            <input type="password" id="cfgGeminiKey" placeholder="AIza…" autocomplete="off" />
+          </label>
+          <button type="submit" class="btn btn-primary">Guardar y activar</button>
+          <span class="form-msg" id="msgGemini"></span>
+        </form>
+        <ol id="stepsGemini" class="step-list"></ol>
+      </details>
+
+      <details class="step-block" id="step-yahoo" open>
+        <summary><span class="step-state">⏳</span> 2. App Password de Yahoo (lectura del correo)</summary>
+        <div class="callout">
+          <strong>¿Por qué App Password y no mi contraseña?</strong><br>
+          Yahoo no deja a apps externas (como ésta) usar tu contraseña normal. Genera una clave única de 16 caracteres que sólo sirve para IMAP y podés revocar cuando quieras.
+        </div>
+        <div class="quick-link" id="yahooQuickLink">
+          <span>Atajo directo:</span>
+          <a href="https://login.yahoo.com/account/security/app-passwords" target="_blank" rel="noopener" id="yahooDirectUrl">login.yahoo.com/account/security/app-passwords</a>
+          <button class="btn btn-sm" data-copy-text="https://login.yahoo.com/account/security/app-passwords">Copiar URL</button>
+        </div>
+        <ol id="stepsYahoo" class="step-list"></ol>
+        <form class="cfg-form" id="formYahoo">
+          <label>Email de Yahoo
+            <input type="email" id="cfgYahooEmail" placeholder="tucuenta@yahoo.com.au" autocomplete="off" />
+          </label>
+          <label>App Password (16 caracteres, con o sin guiones)
+            <input type="password" id="cfgYahooPass" placeholder="abcd-efgh-ijkl-mnop" autocomplete="off" />
+          </label>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">Guardar y probar conexión</button>
+            <button type="button" class="btn" id="btnClearYahoo">Borrar</button>
+          </div>
+          <span class="form-msg" id="msgYahoo"></span>
+        </form>
+      </details>
+
+      <details class="step-block" id="step-google">
+        <summary><span class="step-state">⏳</span> 3. OAuth de Google Drive (para subir)</summary>
+        <div class="callout">
+          <strong>¿Qué permisos pide?</strong> Sólo <code>drive.file</code>: la app únicamente ve y modifica los archivos que ella misma sube. No accede al resto de tu Drive.
+        </div>
+        <ol id="stepsGoogle" class="step-list"></ol>
+        <form class="cfg-form" id="formGoogle">
+          <label>Client ID
+            <input type="text" id="cfgGoogleId" placeholder="xxxxx-yyyyy.apps.googleusercontent.com" autocomplete="off" />
+          </label>
+          <label>Client Secret
+            <input type="password" id="cfgGoogleSecret" placeholder="GOCSPX-…" autocomplete="off" />
+          </label>
+          <label>Redirect URI (debe coincidir con Cloud Console)
+            <input type="text" id="cfgGoogleRedirect" placeholder="http://localhost:3000/api/auth/google/callback" />
+          </label>
+          <button type="submit" class="btn">Guardar credenciales</button>
+          <span class="form-msg" id="msgGoogle"></span>
+        </form>
+        <button class="btn btn-primary" id="btnConnectDrive" disabled>Conectar Google Drive</button>
+        <div id="driveRootBox" class="quick-link" style="display:none; margin-top:.75rem;">
+          <span>Carpeta raíz:</span>
+          <a id="driveRootUrl" href="#" target="_blank" rel="noopener"></a>
+          <button class="btn btn-sm" id="driveRootCopy">Copiar</button>
+        </div>
+        <form class="cfg-form" id="formShareDrive" style="display:none;">
+          <label>Compartir la carpeta con otra persona (ej: el email de Isa)
+            <input type="email" id="cfgShareEmail" placeholder="isa@example.com" autocomplete="off" />
+          </label>
+          <label class="toggle-row" style="font-size:.78rem;">
+            <input type="checkbox" id="cfgShareNotify" checked />
+            Mandarle email de notificación con el link
+          </label>
+          <button type="submit" class="btn btn-primary">Compartir carpeta</button>
+          <span class="form-msg" id="msgShare"></span>
+        </form>
+        <details id="driveExportBox" style="display:none; margin-top:.5rem;" class="step-block">
+          <summary><span class="step-state">💾</span> Hacer tokens persistentes en Render</summary>
+          <p class="muted small">Render free tier reinicia el disco cada despliegue. Para no perder la sesión de Drive, pegá esto en <strong>Render → Environment → Add</strong>:</p>
+          <div class="snippet">
+            <code id="driveExportLine" style="word-break: break-all;">…</code>
+            <button class="btn btn-sm" id="driveExportCopy">Copiar</button>
+          </div>
+          <p class="muted small">Cuando Render reinicie, va a leer este `GOOGLE_TOKENS_JSON` y seguís conectado sin re-autorizar.</p>
+        </details>
+      </details>
+    </section>
+
+    <!-- ──────────────── COMPARTIR CON ISA ──────────────── -->
+    <section class="card" id="shareCard">
+      <div class="card-head">
+        <h2>📲 Compartir con Isa</h2>
+        <button class="btn-link" id="toggleShare">Mostrar QR</button>
+      </div>
+      <p class="muted small">Isa abre la cámara del iPhone, apunta al QR y se le abre Safari en esta misma URL. Si pusiste Basic Auth, le va a pedir usuario y contraseña (una vez).</p>
+      <div id="shareBox" style="display:none; margin-top:1rem;">
+        <div class="qr-row">
+          <img id="shareQR" alt="QR code" />
+          <div class="qr-side">
+            <div class="quick-link">
+              <span>URL de la PWA:</span>
+              <a id="shareUrl" href="#" target="_blank" rel="noopener"></a>
+              <button class="btn btn-sm" id="shareCopyUrl">Copiar URL</button>
+            </div>
+            <button class="btn btn-primary" id="shareWhatsApp">📩 Abrir WhatsApp con mensaje</button>
+            <button class="btn" id="shareMail">📧 Mandar por mail</button>
+            <p class="muted small" style="margin-top:.5rem;">Después le decís a Isa: <em>Compartir ⬆ → "Añadir a pantalla de inicio"</em>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────── BUSCADOR ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>🔎 Clasificar</h2></div>
+      <div class="form-grid">
+        <label>Remitente (nombre o email)
+          <input type="text" id="qFrom" placeholder="ej. ATO, qantas, maria@gmail.com" />
+        </label>
+        <label>Asunto contiene
+          <input type="text" id="qSubject" placeholder="ej. factura, booking" />
+        </label>
+        <label>Tema (concepto libre)
+          <input type="text" id="qTopic" placeholder="ej. impuestos, viaje, familia" />
+        </label>
+        <label>Palabras clave (separadas por espacio)
+          <div class="input-with-mic">
+            <input type="text" id="qKeywords" placeholder="ej. GST ABN refund" />
+            <button type="button" class="mic-btn" id="micKeywords" title="Dictado por voz">🎙️</button>
+          </div>
+        </label>
+        <label>Antigüedad máxima
+          <select id="qSinceDays">
+            <option value="7">7 días</option>
+            <option value="14" selected>14 días</option>
+            <option value="30">30 días</option>
+            <option value="90">90 días</option>
+            <option value="365">1 año</option>
+          </select>
+        </label>
+        <label class="toggle-row">
+          <input type="checkbox" id="qLLM" checked />
+          Usar IA semántica (Gemini)
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="btnSearch">Buscar y clasificar</button>
+        <button class="btn" id="btnSelectAll" disabled>Seleccionar todo</button>
+        <button class="btn btn-accent" id="btnUpload" disabled>Subir a Drive ↑</button>
+        <button class="btn btn-accent" id="btnSearchAndUpload">⚡ Buscar y subir todo</button>
+      </div>
+      <div id="searchHint" class="muted small"></div>
+    </section>
+
+    <!-- ──────────────── CARPETAS DE DRIVE (tras subir) ──────────────── -->
+    <section id="driveFoldersSection" class="card" style="display:none;">
+      <div class="card-head"><h2>📁 Carpetas en Drive</h2></div>
+      <p class="muted small" id="driveFoldersHint"></p>
+      <ul id="driveFoldersList" class="folders-list"></ul>
+    </section>
+
+    <!-- ──────────────── RESULTADOS ──────────────── -->
+    <section id="resultsSection" class="card" style="display:none;">
+      <div class="card-head">
+        <h2>📬 Resultados <span id="resultsCount" class="muted small"></span></h2>
+        <div class="legend">
+          <span class="chip chip-red">Alta urgencia</span>
+          <span class="chip chip-yellow">Acción requerida</span>
+          <span class="chip chip-green">Factura/Receipt</span>
+        </div>
+      </div>
+      <ul id="resultsList" class="results"></ul>
+    </section>
+
+    <!-- ──────────────── EJES DE CLASIFICACIÓN ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>🧠 Ejes de clasificación que usa este sistema</h2></div>
+      <p class="muted">No es un filtro de palabras. Cada email se evalúa contra <strong>17 dimensiones</strong>. Una herramienta típica de mail rules solo cubre 2–3 (remitente + asunto).</p>
+      <ol class="axes-list" id="axesList"></ol>
+    </section>
+
+    <!-- ──────────────── BACKUP/RESTORE ──────────────── -->
+    <section class="card">
+      <div class="card-head"><h2>💾 Backup / Restore</h2></div>
+      <p class="muted small">Descargá un archivo con toda tu configuración (Gemini, OAuth Google, App Password de Yahoo, tokens Drive). Sirve para migrar a otra Mac o a Render sin re-tipear.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/api/config/backup" download>📥 Descargar backup</a>
+        <button class="btn" id="btnRestore">📤 Restaurar desde archivo</button>
+        <input type="file" id="restoreFile" accept="application/json" style="display:none;" />
+      </div>
+      <span class="form-msg" id="msgRestore"></span>
+    </section>
+
+    <!-- ──────────────── SISTEMA ──────────────── -->
+    <section class="card" id="systemCard" style="display:none;">
+      <div class="card-head"><h2>⚙️ Esta Mac</h2></div>
+      <p class="muted small" id="systemInfo"></p>
+      <div class="actions">
+        <button class="btn btn-primary" id="btnInstallLA">Hacer permanente (auto-start)</button>
+        <button class="btn" id="btnUninstallLA">Quitar auto-start</button>
+      </div>
+      <span class="form-msg" id="msgLA"></span>
+      <p class="muted small" style="margin-top:.5rem;">"Hacer permanente" instala un LaunchAgent: cada vez que loguees en esta Mac, el server arranca solo y se reinicia si crashea. Logs en <code>~/Library/Logs/renderz-inbox.*.log</code>.</p>
+    </section>
+
+    <footer class="footer">
+      <p class="muted small">Datos en disco: <code>data/google-token.json</code>, <code>data/mail-rules.json</code>, <code>data/mail-history.json</code>, <code>data/runtime-config.json</code>. Nunca se suben al repo.</p>
+      <p class="muted small">Diagnóstico: <a href="/status.html" style="color:var(--accent);">/status.html</a> · Health: <a href="/healthz" style="color:var(--accent);">/healthz</a></p>
+    </footer>
+  </div>
+
+  <script src="inbox.js"></script>
+</body>
+</html>

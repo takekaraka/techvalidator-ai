@@ -1,5 +1,4 @@
 node_modules/
 .env
-data/videos/
-data/analyses.json
+data/
 .DS_Store
