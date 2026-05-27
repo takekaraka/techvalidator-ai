@@ -85,8 +85,9 @@ for q in "${QUERIES[@]}"; do
   count=$(echo "$resp" | jq '.items | length' 2>/dev/null || echo 0)
   echo "→ $count emails"
   echo "[$i] $label → $count" >> "$LOG"
-  # Merge items en el archivo acumulado, dedupe por uid después
-  echo "$resp" | jq '.items // []' | jq -s '.[0] + (input // [])' "$ITEMS_FILE" /dev/stdin > "$ITEMS_FILE.tmp" 2>/dev/null \
+  # Append items al archivo acumulado (dedupe global se hace después).
+  echo "$resp" | jq '.items // []' > /tmp/sweep_new.json
+  jq -s 'add' "$ITEMS_FILE" /tmp/sweep_new.json > "$ITEMS_FILE.tmp" 2>/dev/null \
     && mv "$ITEMS_FILE.tmp" "$ITEMS_FILE"
 done
 
