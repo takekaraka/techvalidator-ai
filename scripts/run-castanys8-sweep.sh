@@ -30,22 +30,21 @@ fi
 echo "[*] jq version: $(jq --version)"
 echo "[*] curl version: $(curl --version | head -1)"
 
-# Wake-up retry: Render free duerme tras 15 min sin tráfico, primera petición
-# puede tardar 30-60s en despertar. Probamos hasta 5 veces con backoff.
-echo "[*] Comprobando conexión a $URL/healthz (con retry para dyno frío)..."
+# Wake-up + redeploy wait: Render free duerme + tras un push de código
+# tarda 2-3 min en redeployar. Probamos hasta 18 veces × 15s = 4.5 min.
+echo "[*] Comprobando conexión a $URL/healthz (espera hasta redeploy completo)..."
 attempt=0
 healthy=0
-while [ $attempt -lt 5 ]; do
+while [ $attempt -lt 18 ]; do
   attempt=$((attempt + 1))
-  echo "    intento $attempt..."
-  status=$(curl -sS -m 60 -o /tmp/health.json -w "%{http_code}" "$URL/healthz" 2>&1 || echo "curl_err")
-  echo "    → HTTP $status"
+  status=$(curl -sS -m 30 -o /tmp/health.json -w "%{http_code}" "$URL/healthz" 2>&1 || echo "curl_err")
   if [ "$status" = "200" ]; then
     healthy=1
+    echo "    intento $attempt → HTTP 200 ✓"
     break
   fi
-  echo "    body: $(cat /tmp/health.json 2>/dev/null | head -c 200)"
-  sleep 10
+  echo "    intento $attempt → HTTP $status (esperando redeploy)..."
+  sleep 15
 done
 
 if [ $healthy -eq 0 ]; then
