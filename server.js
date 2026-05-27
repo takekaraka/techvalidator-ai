@@ -438,9 +438,9 @@ app.post('/api/mail/upload', async (req, res) => {
     const { items = [], rootFolder } = req.body || {};
     if (!items.length) return res.status(400).json({ error: 'No items provided' });
 
-    // Cap a 10 emails por request — sobrevive al timeout de 60s en Render free.
-    // Si llegan más, el frontend hace tandas.
-    const MAX_PER_REQUEST = 10;
+    // Cap a 5 emails por request — sobrevive al timeout de Render free.
+    // Cada email puede tener attachments pesados; subir 5 deja margen.
+    const MAX_PER_REQUEST = 5;
     const batch = items.slice(0, MAX_PER_REQUEST);
     const skipped = items.length - batch.length;
 
