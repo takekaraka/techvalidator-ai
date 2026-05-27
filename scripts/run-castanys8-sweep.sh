@@ -128,7 +128,7 @@ fi
 
 # Upload por tandas de 10 con retry y skip-on-zero (en lugar de break)
 echo "[*] Subiendo $total_uniq emails a Drive en tandas de 10..."
-batch_size=5
+batch_size=3
 batch_num=0
 uploaded=0
 cursor=0
