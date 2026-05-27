@@ -126,30 +126,52 @@ if [ "$total_uniq" -eq 0 ]; then
   exit 0
 fi
 
-# Upload por tandas de 10
+# Upload por tandas de 10 con retry y skip-on-zero (en lugar de break)
 echo "[*] Subiendo $total_uniq emails a Drive en tandas de 10..."
 batch_size=10
 batch_num=0
 uploaded=0
-while [ $uploaded -lt $total_uniq ]; do
+cursor=0
+errors=0
+while [ $cursor -lt $total_uniq ]; do
   batch_num=$((batch_num+1))
-  start=$uploaded
-  end=$((uploaded + batch_size))
+  start=$cursor
+  end=$((cursor + batch_size))
   batch_json=$(jq ".[$start:$end]" "$ITEMS_FILE")
   printf "  Tanda %2d (emails %d–%d)... " "$batch_num" "$((start+1))" "$end"
-  resp=$(curl -sS -u "$USER:$PASS" -X POST "$URL/api/mail/upload" \
-    -H 'Content-Type: application/json' \
-    -d "{\"items\":$batch_json}" -m 90)
-  consumed=$(echo "$resp" | jq -r '.batch_size // 0' 2>/dev/null)
-  err=$(echo "$resp" | jq -r '.error // empty' 2>/dev/null)
+
+  consumed=0
+  err=""
+  for try in 1 2 3; do
+    resp=$(curl -sS -u "$USER:$PASS" -X POST "$URL/api/mail/upload" \
+      -H 'Content-Type: application/json' \
+      -d "{\"items\":$batch_json}" -m 180 2>&1)
+    consumed=$(echo "$resp" | jq -r '.batch_size // 0' 2>/dev/null)
+    err=$(echo "$resp" | jq -r '.error // empty' 2>/dev/null)
+    [ -n "$err" ] || [ "$consumed" -gt 0 ] && break
+    echo -n " retry${try}… "
+    sleep $((try * 5))
+  done
+
   if [ -n "$err" ]; then
     echo "✗ $err"
     echo "TANDA $batch_num ERROR: $err" >> "$LOG"
-    break
+    errors=$((errors + 1))
+    cursor=$((cursor + batch_size))   # avanza igual para no quedarse atascado
+    [ $errors -gt 5 ] && echo "[!] >5 tandas con error, paro." && break
+    continue
   fi
+
+  if [ "$consumed" -eq 0 ]; then
+    echo "○ 0 (los UIDs ya no están en IMAP, salto)"
+    echo "TANDA $batch_num SKIPPED: 0 consumed" >> "$LOG"
+    cursor=$((cursor + batch_size))
+    continue
+  fi
+
   echo "✓ +$consumed"
   uploaded=$((uploaded + consumed))
-  [ "$consumed" -eq 0 ] && echo "[!] Tanda devolvió 0 emails consumidos, paro." && break
+  cursor=$((cursor + consumed))
 done
 
 echo ""
