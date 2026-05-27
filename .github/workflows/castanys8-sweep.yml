@@ -10,6 +10,9 @@ on:
       - '.github/workflows/castanys8-sweep.yml'
       - 'scripts/run-castanys8-sweep.sh'
   workflow_dispatch:
+  schedule:
+    # Cada hora en punto. Sube emails nuevos a Drive automáticamente.
+    - cron: '0 * * * *'
 
 permissions:
   contents: read
