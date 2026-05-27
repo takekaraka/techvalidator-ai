@@ -1,0 +1,58 @@
+name: Castanys 8 Sweep
+
+# Ejecuta el barrido contra el servicio Render desde infra de GitHub
+# (que sí puede alcanzar onrender.com). Auto-trigger en cambios a este
+# archivo o manual via workflow_dispatch.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/castanys8-sweep.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+
+      - name: Prepare output dir
+        run: mkdir -p "$HOME/Desktop"
+
+      - name: Run Castanys 8 sweep against deployed Render service
+        env:
+          RENDER_URL: https://renderz-studio-tools.onrender.com
+          BASIC_USER: isa
+          BASIC_PASS: ${{ secrets.BASIC_AUTH_PASS || 'Mailisa2026' }}
+        run: |
+          chmod +x scripts/run-castanys8-sweep.sh
+          ./scripts/run-castanys8-sweep.sh 2>&1 | tee /tmp/sweep-output.txt
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Castanys 8 Sweep Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Last 50 lines of output:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -50 /tmp/sweep-output.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "no output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: castanys8-logs
+          path: |
+            /home/runner/Desktop/castanys8-*.log
+            /home/runner/Desktop/castanys8-*.txt
+            /home/runner/Desktop/castanys8-*.json
+            /tmp/sweep-output.txt
+          if-no-files-found: warn
