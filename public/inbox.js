@@ -350,6 +350,86 @@ async function doSearchAndUploadAll() {
   $('#btnSearchAndUpload').textContent = '⚡ Buscar y subir todo';
 }
 
+// Barrido "Castanys 8": ejecuta una lista de búsquedas (personas + temas) sobre
+// los últimos 6 años, deduplica por uid, y los sube todos a Drive.
+const CASTANYS8_QUERIES = [
+  { from: 'matias' },              // matias pincheira
+  { from: 'pincheira' },
+  { from: 'mary szental' },
+  { from: 'szental' },
+  { from: 'carlos rodriguez' },
+  { from: 'rodriguez' },
+  { from: 'jorge villar' },
+  { from: 'villar' },
+  { from: 'joan fortuny' },
+  { from: 'fortuny' },
+  { from: 'david' },
+  { from: 'constructa' },
+  { from: 'isabella_gem' },        // enviados por Isa
+  { keywords: 'castany' },
+  { keywords: 'castanys 8' },
+  { keywords: 'planos' },
+  { keywords: 'plano' },
+  { keywords: 'dossier' },
+  { keywords: 'dossiers' },
+  { keywords: 'factura' },
+  { keywords: 'presupuesto' },
+  { keywords: 'inmobiliaria' },
+  { keywords: 'material' },
+  { subject: 'castany' },
+  { subject: 'reforma' },
+  { subject: 'obra' },
+];
+
+async function doCastanys8Sweep() {
+  const btn = $('#btnCastanys8');
+  const progress = $('#castanysProgress');
+  btn.disabled = true;
+  const total = CASTANYS8_QUERIES.length;
+  const allByUid = new Map();
+  let i = 0;
+  for (const q of CASTANYS8_QUERIES) {
+    i++;
+    const label = q.from ? `de:${q.from}` : q.subject ? `asunto:${q.subject}` : `palabra:${q.keywords}`;
+    progress.textContent = ` Buscando ${i}/${total} (${label})…`;
+    btn.textContent = `🏠 Buscando ${i}/${total}…`;
+    try {
+      const r = await fetch('/api/mail/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...q, sinceDays: 2190, limit: 100, useLLM: false }),
+      });
+      const data = await r.json();
+      if (data.items) {
+        for (const it of data.items) {
+          if (!allByUid.has(String(it.uid))) allByUid.set(String(it.uid), it);
+        }
+      }
+      progress.textContent = ` ${i}/${total} hecho. Total único: ${allByUid.size}`;
+    } catch (e) {
+      console.warn('castanys sweep err', label, e);
+    }
+  }
+  const merged = Array.from(allByUid.values());
+  renderResults({ items: merged, mock: false });
+  progress.textContent = ` ✓ ${merged.length} emails únicos. Subiendo a Drive…`;
+  if (!merged.length) {
+    btn.disabled = false;
+    btn.textContent = '🏠 Barrido Castanys 8 (6 años, todo)';
+    return;
+  }
+  $$('#resultsList input[type="checkbox"]').forEach((c) => (c.checked = true));
+  updateUploadState();
+  try {
+    await doUpload();
+    progress.textContent = ` ✓ Subido. ${merged.length} emails en Drive.`;
+  } catch (e) {
+    progress.textContent = ` ✗ Error subiendo: ${e.message}`;
+  }
+  btn.disabled = false;
+  btn.textContent = '🏠 Barrido Castanys 8 (6 años, todo)';
+}
+
 function setMsg(id, text, kind) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -470,6 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#btnSearch').addEventListener('click', doSearch);
   $('#btnUpload').addEventListener('click', doUpload);
   $('#btnSearchAndUpload').addEventListener('click', doSearchAndUploadAll);
+  $('#btnCastanys8').addEventListener('click', doCastanys8Sweep);
 
   setupVoiceInput('#micKeywords', '#qKeywords');
 
