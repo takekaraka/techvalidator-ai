@@ -438,8 +438,9 @@ app.post('/api/mail/upload', async (req, res) => {
     const { items = [], rootFolder } = req.body || {};
     if (!items.length) return res.status(400).json({ error: 'No items provided' });
 
-    // Cap a 3 emails por request — Render free 512MB ya sufre con .eml grandes.
-    const MAX_PER_REQUEST = 3;
+    // Cap a 1 email por request — Render free 512MB OOMea con 3+. Único valor
+    // que garantiza no caer el server. Más tandas pero todas exitosas.
+    const MAX_PER_REQUEST = 1;
     const batch = items.slice(0, MAX_PER_REQUEST);
     const skipped = items.length - batch.length;
 
