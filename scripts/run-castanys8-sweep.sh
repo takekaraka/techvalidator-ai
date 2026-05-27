@@ -12,27 +12,47 @@
 # Requisitos: curl, jq
 
 set -u
-set -o pipefail
 
 URL="${RENDER_URL:-https://renderz-studio-tools.onrender.com}"
 USER="${BASIC_USER:-isa}"
 PASS="${BASIC_PASS:-Mailisa2026}"
+
+echo "[*] Configuración:"
+echo "    URL=$URL"
+echo "    USER=$USER"
+echo "    PASS=$(echo "$PASS" | head -c 4)...***"
 
 # Verifica jq
 if ! command -v jq >/dev/null 2>&1; then
   echo "[!] jq no instalado. Instala con: brew install jq"
   exit 1
 fi
+echo "[*] jq version: $(jq --version)"
+echo "[*] curl version: $(curl --version | head -1)"
 
-# Verifica conectividad + auth
-echo "[*] Comprobando conexión a $URL..."
-status=$(curl -sS -u "$USER:$PASS" -o /tmp/health.json -w "%{http_code}" "$URL/healthz")
-if [ "$status" != "200" ]; then
-  echo "[!] /healthz devuelve $status. Verifica URL/credenciales."
-  cat /tmp/health.json
-  exit 1
+# Wake-up retry: Render free duerme tras 15 min sin tráfico, primera petición
+# puede tardar 30-60s en despertar. Probamos hasta 5 veces con backoff.
+echo "[*] Comprobando conexión a $URL/healthz (con retry para dyno frío)..."
+attempt=0
+healthy=0
+while [ $attempt -lt 5 ]; do
+  attempt=$((attempt + 1))
+  echo "    intento $attempt..."
+  status=$(curl -sS -m 60 -o /tmp/health.json -w "%{http_code}" "$URL/healthz" 2>&1 || echo "curl_err")
+  echo "    → HTTP $status"
+  if [ "$status" = "200" ]; then
+    healthy=1
+    break
+  fi
+  echo "    body: $(cat /tmp/health.json 2>/dev/null | head -c 200)"
+  sleep 10
+done
+
+if [ $healthy -eq 0 ]; then
+  echo "[!] No pudo establecer conexión con $URL tras 5 intentos."
+  echo "[*] Continuamos igual para diagnosticar (las búsquedas reportarán errores individuales)."
 fi
-echo "    ✓ Service Live"
+echo "[*] Service status: healthy=$healthy"
 
 LOG="$HOME/Desktop/castanys8-sweep.log"
 UIDS_FILE="$HOME/Desktop/castanys8-uids.txt"
