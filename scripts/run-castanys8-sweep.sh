@@ -1,5 +1,6 @@
 #!/bin/bash
-# Castanys 8 — Sweep ejecutado desde la Mac contra el servicio Render desplegado.
+# Castanys 8 — Sweep contra el servicio Render desplegado.
+# Versión post-OOM-fix: uploads de .eml solamente (sin attachments separados).
 #
 # Hace el barrido entero de Yahoo (26 queries) + upload a Drive desde la Mac
 # vía curl. Más fiable que el botón del navegador (sin JS, sin SW, sin tab que
