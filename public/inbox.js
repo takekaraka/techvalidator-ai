@@ -263,21 +263,33 @@ function renderDriveFolders(data) {
 async function doUpload() {
   const idxs = selectedIndices();
   if (!idxs.length) return;
-  const items = idxs.map((i) => LAST_RESULTS[i]);
+  const allItems = idxs.map((i) => LAST_RESULTS[i]);
   const btn = $('#btnUpload');
-  btn.disabled = true; btn.textContent = 'Subiendo…';
+  btn.disabled = true;
+  let pending = [...allItems];
+  let totalUploaded = 0;
+  let lastData = null;
   try {
-    const r = await fetch('/api/mail/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items }),
-    });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || 'Error');
-    renderDriveFolders(data);
+    while (pending.length) {
+      btn.textContent = `Subiendo ${totalUploaded}/${allItems.length}…`;
+      const r = await fetch('/api/mail/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: pending }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Error');
+      lastData = data;
+      const consumed = data.batch_size || 0;
+      totalUploaded += consumed;
+      pending = pending.slice(consumed);
+      if (!data.has_more) break;
+    }
+    btn.textContent = `✓ ${totalUploaded} subidos`;
+    if (lastData) renderDriveFolders(lastData);
+    setTimeout(() => updateUploadState(), 2000);
   } catch (e) {
-    alert('Error subiendo: ' + e.message);
-  } finally {
+    alert(`Error subiendo (${totalUploaded}/${allItems.length} ok): ` + e.message);
     updateUploadState();
   }
 }

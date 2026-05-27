@@ -15,7 +15,7 @@ import {
   deleteAnalysis,
   getStats,
 } from './lib/analyzer.js';
-import { searchYahoo, hasYahooCredentials } from './lib/yahoo.js';
+import { searchYahoo, fetchYahooByUids, hasYahooCredentials } from './lib/yahoo.js';
 import { initClassifier, classifyEmails } from './lib/classifier.js';
 import {
   getAuthUrl,
@@ -438,15 +438,19 @@ app.post('/api/mail/upload', async (req, res) => {
     const { items = [], rootFolder } = req.body || {};
     if (!items.length) return res.status(400).json({ error: 'No items provided' });
 
-    // Para producción real necesitamos el raw .eml y attachments con su buffer.
-    // Si llegan solo metadatos (caso típico desde la PWA), re-buscamos por uid en Yahoo.
+    // Cap a 10 emails por request — sobrevive al timeout de 60s en Render free.
+    // Si llegan más, el frontend hace tandas.
+    const MAX_PER_REQUEST = 10;
+    const batch = items.slice(0, MAX_PER_REQUEST);
+    const skipped = items.length - batch.length;
+
     const enriched = [];
     if (hasYahooCredentials()) {
-      // Re-fetch by uid for each requested item.
-      const uids = items.map((i) => String(i.uid));
-      const { messages } = await searchYahoo({ keywords: '' }, { limit: 200 });
+      // Fetch directly by UID — funciona para emails de cualquier antigüedad.
+      const uids = batch.map((i) => String(i.uid));
+      const { messages } = await fetchYahooByUids(uids);
       const byUid = new Map(messages.map((m) => [String(m.uid), m]));
-      for (const it of items) {
+      for (const it of batch) {
         const m = byUid.get(String(it.uid));
         if (!m) continue;
         enriched.push({
@@ -468,7 +472,7 @@ app.post('/api/mail/upload', async (req, res) => {
 
     const result = await uploadClassifiedEmails(enriched, { rootName: rootFolder });
     appendHistory({ kind: 'upload', count: result.uploaded.length, mock: result.mock });
-    res.json(result);
+    res.json({ ...result, batch_size: enriched.length, skipped, has_more: skipped > 0 });
   } catch (err) {
     console.error('mail/upload error:', err);
     res.status(500).json({ error: err.message });
