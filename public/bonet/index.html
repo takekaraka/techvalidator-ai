@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ferretería Bonet · El Poblenou desde 1952</title>
+<meta name="description" content="Ferretería Bonet. Desde 1952 en los bajos del Flatiron del Poblenou. Herramienta, fontanería, electricidad, pintura y consejo de oficio en Carrer de Pere IV 102, Barcelona.">
+<meta property="og:title" content="Ferretería Bonet · El Poblenou desde 1952">
+<meta property="og:description" content="La ferretería que sostiene el barrio desde 1952. En los bajos del Flatiron del Poblenou.">
+<meta property="og:type" content="business.business">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2316120d'/%3E%3Cpolygon points='16,7 25,25 7,25' fill='%23c2451d'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <a class="brand" href="#top">
+    <svg class="mark" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 0 L16 22 L0 22 Z"/></svg>
+    Bonet
+  </a>
+  <div class="nav-links">
+    <a href="#historia">Historia</a>
+    <a href="#productos">Qué vendemos</a>
+    <a href="#porque">Por qué Bonet</a>
+    <a class="cta" href="tel:+34933001582">933 001 582</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+
+  <!-- El Flatiron del Poblenou -->
+  <svg class="hero-building" id="building" viewBox="0 0 360 760" aria-label="El Flatiron del Poblenou, Casa Antònia Serra i Mas">
+    <!-- cuerpo cara clara (izquierda) -->
+    <polygon class="face-light" points="120,150 250,150 250,720 120,720"/>
+    <!-- cara en sombra (proa triangular derecha) -->
+    <polygon class="face-dark" points="250,150 250,720 320,720 320,210"/>
+    <!-- proa redondeada -->
+    <path class="face-dark" d="M250,150 Q300,160 320,210 L320,260 L250,260 Z"/>
+    <!-- base de piedra de Montjuïc -->
+    <rect class="stone" x="120" y="660" width="200" height="60"/>
+    <!-- mirador / cúpula -->
+    <polygon class="cupola" points="250,150 270,90 290,150"/>
+    <rect class="cupola" x="262" y="120" width="16" height="34"/>
+    <!-- ventanas, generadas por filas -->
+    <g id="windows"></g>
+    <!-- aristas -->
+    <line class="edge" x1="250" y1="150" x2="250" y2="720"/>
+    <line class="edge" x1="120" y1="150" x2="120" y2="720"/>
+  </svg>
+
+  <div class="hero-inner">
+    <p class="eyebrow delayed">El Poblenou · Barcelona · desde 1952</p>
+    <h1>
+      <span class="reveal-line"><span>La ferretería</span></span>
+      <span class="reveal-line"><span>que sostiene <em>el&nbsp;barrio.</em></span></span>
+    </h1>
+    <p class="lede delayed">
+      Tres cuartos de siglo en los bajos del <strong>Flatiron del Poblenou</strong>.
+      Cuando cerraron las fábricas, nosotros seguimos abriendo la persiana cada mañana.
+    </p>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Baja</span>
+    <span class="bar"></span>
+  </div>
+</header>
+
+<!-- ============ TICKER ============ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Herramienta</span><span>Tornillería</span><span>Fontanería</span><span>Electricidad</span>
+    <span>Pintura</span><span>Cerrajería</span><span>Jardín</span><span>Menaje</span><span>Suministro industrial</span>
+    <span>Herramienta</span><span>Tornillería</span><span>Fontanería</span><span>Electricidad</span>
+    <span>Pintura</span><span>Cerrajería</span><span>Jardín</span><span>Menaje</span><span>Suministro industrial</span>
+  </div>
+</div>
+
+<!-- ============ MANIFIESTO ============ -->
+<section class="manifesto section-pad">
+  <div class="wrap">
+    <p class="eyebrow muted r">Lo que somos</p>
+    <h2 class="r d1">No vendemos productos. Resolvemos <span class="hl">el problema</span> con el que entras por la puerta.</h2>
+    <p class="sub r d2">Un tornillo que no encuentras. Un grifo que gotea desde el martes. Una obra que no puede esperar al lunes. Para eso llevamos aquí desde 1952.</p>
+  </div>
+</section>
+
+<!-- ============ HISTORIA ============ -->
+<section class="story section-pad" id="historia">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <p class="eyebrow r">La casa</p>
+        <h2 class="r d1">El Flatiron que nadie esperaba encontrar en Barcelona.</h2>
+        <p class="r d2">En 1926, el arquitecto <strong>Ramon Puig Gairalt</strong> levantó en la esquina de Pere IV un edificio noucentista de planta triangular, esquinas redondeadas y una cúpula que mira al barrio: la <strong>Casa Antònia Serra i Mas</strong>. El barrio la bautizó como el <strong>Flatiron del Poblenou</strong>, el pequeño rascacielos de proa de la «Nova York del Mediterrani».</p>
+        <p class="pull">«La arquitectura se quedó quieta. El barrio cambió entero a su alrededor. Y en los bajos, nosotros seguimos aquí.»</p>
+        <p class="r d3">En 1952 abrimos en esos bajos. Entonces el Poblenou era el <strong>Manchester catalán</strong>: chimeneas, telares, hierro. Llegaron los Juegos del 92, se fueron las fábricas, nació el 22@ y las torres de cristal. De toda aquella manzana, <strong>Bonet es el único que nunca cerró la persiana.</strong></p>
+      </div>
+      <div class="r d2">
+        <div class="timeline">
+          <div class="tl-item"><div class="year">1926</div><div class="what">Puig Gairalt construye la Casa Antònia Serra i Mas, el Flatiron del Poblenou.</div></div>
+          <div class="tl-item"><div class="year">1952</div><div class="what">Abre Ferretería Bonet en los bajos del edificio, al servicio de la industria del barrio.</div></div>
+          <div class="tl-item"><div class="year">1992</div><div class="what">Los Juegos transforman el Poblenou. Las fábricas se van; nosotros nos quedamos.</div></div>
+          <div class="tl-item"><div class="year">2001</div><div class="what">Segunda tienda dedicada a fontanería y electricidad para el profesional.</div></div>
+          <div class="tl-item"><div class="year">2007</div><div class="what">Entramos en Cadena88: más catálogo, mejor precio, el mismo trato de siempre.</div></div>
+          <div class="tl-item"><div class="year">Hoy</div><div class="what">Tres generaciones de oficio sirviendo a vecinos, gremios y al nuevo 22@.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats section-pad">
+  <div class="wrap">
+    <div class="row">
+      <div class="stat r">       <div class="num" data-count="1952" data-plain="1">1952</div><div class="label">Abriendo cada mañana</div></div>
+      <div class="stat r d1">      <div class="num" data-count="70"><span>70</span><span class="suf">+ años</span></div><div class="label">De oficio en el barrio</div></div>
+      <div class="stat r d2">      <div class="num" data-count="10000"><span>10.000</span><span class="suf">+ ref.</span></div><div class="label">En catálogo y a un día</div></div>
+      <div class="stat r d3">      <div class="num" data-count="1" data-plain="1">1</div><div class="label">Edificio irrepetible</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRODUCTOS ============ -->
+<section class="cats section-pad" id="productos">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="eyebrow r">Qué vas a encontrar</p>
+        <h2 class="r d1">Si existe, está aquí. Y si no, te lo traemos.</h2>
+      </div>
+      <p class="r d2">Diez familias de producto bajo un mismo techo. Para que no tengas que dar tres viajes ni gastar gasolina buscando una pieza.</p>
+    </div>
+
+    <div class="cat-grid">
+      <article class="cat r"><span class="idx">01</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 7l3-3 3 3-3 3M3 21l8-8M5 11l8 8"/></svg>
+        <div><h3>Herramienta manual y eléctrica</h3><p>Atornilladores, taladros, amoladoras, sierras, llaves, alicates. Marca de profesional.</p></div>
+      </article>
+      <article class="cat r d1"><span class="idx">02</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v8M9 5l3-3 3 3M6 13h12l-1 9H7z"/></svg>
+        <div><h3>Tornillería y fijación</h3><p>Tornillos, tacos, anclajes, varilla, abrazaderas, adhesivos. La pieza exacta, suelta o en caja.</p></div>
+      </article>
+      <article class="cat r d2"><span class="idx">03</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 4v6a5 5 0 0010 0V8M17 8h3M14 20h-4"/></svg>
+        <div><h3>Fontanería</h3><p>Grifería, válvulas, racores, sanitarios, bombas y grupos de presión, riego y tratamiento de agua.</p></div>
+      </article>
+      <article class="cat r"><span class="idx">04</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
+        <div><h3>Electricidad</h3><p>Cable, mecanismos, cuadros, iluminación LED, automatismos y todo el pequeño material eléctrico.</p></div>
+      </article>
+      <article class="cat r d1"><span class="idx">05</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h11v6H5zM16 6h3v5l-6 2v8M9 9v3"/></svg>
+        <div><h3>Pintura y droguería</h3><p>Esmaltes, plásticas, barnices, imprimaciones y tintado. Rodillos, brochas y todo el consumible.</p></div>
+      </article>
+      <article class="cat r d2"><span class="idx">06</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="14" r="5"/><path d="M11.5 10.5L20 2M16 4l3 3"/></svg>
+        <div><h3>Cerrajería y llaves</h3><p>Copia de llaves al momento, bombines de seguridad, cerraduras, candados y herrajes.</p></div>
+      </article>
+      <article class="cat r"><span class="idx">07</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22V11M12 11c0-4 3-7 7-7-1 5-3 7-7 7zM12 13C8 13 5 10 5 6c4 0 7 3 7 7z"/></svg>
+        <div><h3>Jardín y exterior</h3><p>Maquinaria, vallado, mobiliario y accesorios de jardín, terraza y huerto urbano.</p></div>
+      </article>
+      <article class="cat r d1"><span class="idx">08</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 9h16l-1.5 11h-13zM7 9V6a5 5 0 0110 0v3"/></svg>
+        <div><h3>Menaje y hogar</h3><p>Cocina, baño, limpieza y los mil recambios que sólo encuentras en la ferretería del barrio.</p></div>
+      </article>
+      <article class="cat r d2"><span class="idx">09</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>
+        <div><h3>Climatización y ventilación</h3><p>Calefactores eléctricos y de gas, ventiladores y todo para pasar el frío y el calor.</p></div>
+      </article>
+      <article class="cat r"><span class="idx">10</span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V8l6-3 6 3v13M9 21v-5h0M15 11h6v10M3 21h18"/></svg>
+        <div><h3>Suministro industrial</h3><p>Consumibles, EPIs, abrasivos y reposición para talleres, gremios y mantenimiento. Servicio rápido.</p></div>
+      </article>
+    </div>
+    <p class="note r">¿No lo ves en la lista? Pregunta. Con la red de Cadena88 detrás, lo que no está en el mostrador suele estar al día siguiente.</p>
+  </div>
+</section>
+
+<!-- ============ POR QUÉ BONET ============ -->
+<section class="why section-pad" id="porque">
+  <div class="wrap">
+    <div class="grid">
+      <div class="sticky">
+        <p class="eyebrow">Por qué Bonet</p>
+        <h2>Setenta años no se improvisan.</h2>
+        <p>Las grandes superficies tienen pasillos. Nosotros tenemos respuestas. Esa es la diferencia que no cabe en un código de barras.</p>
+      </div>
+      <div class="reasons">
+        <div class="reason r"><div class="n">01</div><div><h3>Consejo de quien lo ha instalado</h3><p>No te señalamos un estante: te decimos qué pieza necesitas, por qué, y cómo montarla sin volver. Saber de oficio se paga solo en los viajes que te ahorras.</p></div></div>
+        <div class="reason r d1"><div class="n">02</div><div><h3>Lo tienes todo, en una parada</h3><p>De un tornillo del cuatro a un grupo de presión. Sin pedir cita, sin esperar reparto, sin gastar la mañana entre tres tiendas.</p></div></div>
+        <div class="reason r d2"><div class="n">03</div><div><h3>Precio de Cadena88, trato de barrio</h3><p>Desde 2007 compramos con la fuerza de una red nacional. Tú pagas precio de cadena y te atiende quien te conoce por el nombre.</p></div></div>
+        <div class="reason r d3"><div class="n">04</div><div><h3>Para el vecino y para el gremio</h3><p>Lo mismo te resolvemos un apaño de casa que la reposición de un taller del 22@. Particular o profesional, misma puerta.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISITA ============ -->
+<section class="visit section-pad" id="visita">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <p class="eyebrow r">Pásate</p>
+        <h2 class="r d1">Estamos donde<br>siempre. Bajo<br>la cúpula.</h2>
+        <div class="addr r d2">
+          <span class="k">Dirección</span>
+          Carrer de Pere IV, 102 · 08005 Barcelona<br>Poblenou — bajos del Flatiron
+          <span class="k">Teléfono</span>
+          933 001 582
+          <span class="k">Email</span>
+          bonet@ferreteriabonetsl.com
+        </div>
+        <div class="btns r d3">
+          <a class="btn primary" href="https://maps.google.com/?q=Ferreteria+Bonet+Carrer+de+Pere+IV+102+Barcelona" target="_blank" rel="noopener">Cómo llegar →</a>
+          <a class="btn ghost" href="tel:+34933001582">Llamar a la tienda</a>
+        </div>
+      </div>
+      <div class="map-card r d2" aria-hidden="true">
+        <svg viewBox="0 0 200 260"><polygon points="100,30 150,250 50,250" fill="none" stroke="#b88a3e" stroke-width="1.4" opacity=".5"/><polygon points="100,30 150,250 100,250" fill="#b88a3e" opacity=".08"/><line x1="100" y1="30" x2="100" y2="250" stroke="#b88a3e" stroke-width=".8" opacity=".3"/></svg>
+        <div class="pin"><div class="dot"></div><span>Pere IV, 102</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <div class="brand">Bonet<small>Ferretería del Poblenou · desde 1952</small></div>
+      </div>
+      <div class="meta">
+        Carrer de Pere IV, 102 · 08005 Barcelona<br>
+        <a href="tel:+34933001582">933 001 582</a> · <a href="mailto:bonet@ferreteriabonetsl.com">bonet@ferreteriabonetsl.com</a><br>
+        <a href="#productos">Qué vendemos</a> · <a href="#historia">Historia</a> · <a href="#visita">Visita</a>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <div class="tri-rule"><span>▲</span></div>
+    <div class="fine">
+      <span>© 1952–2026 Ferretería Bonet S.L. · En los bajos de la Casa Antònia Serra i Mas (1926, R. Puig Gairalt).</span>
+      <span>El Flatiron del Poblenou.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
