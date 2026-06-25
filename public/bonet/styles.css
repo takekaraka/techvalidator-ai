@@ -37,6 +37,7 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   font-weight: 400;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
