@@ -148,6 +148,12 @@ while [ $cursor -lt $total_uniq ]; do
       -d "{\"items\":$batch_json}" -m 180 2>&1)
     consumed=$(echo "$resp" | jq -r '.batch_size // 0' 2>/dev/null)
     err=$(echo "$resp" | jq -r '.error // empty' 2>/dev/null)
+    # mock=true: Render perdió el token de Drive (reinicio) y no sube nada real.
+    if [ "$(echo "$resp" | jq -r '.mock // false' 2>/dev/null)" = "true" ]; then
+      echo "✗ Drive NO conectado en Render (modo mock): no se sube nada."
+      echo "[!] Configurá GOOGLE_TOKENS_JSON en Render (ver /api/auth/google/export)."
+      exit 1
+    fi
     [ -n "$err" ] || [ "$consumed" -gt 0 ] && break
     echo -n " retry${try}… "
     sleep $((try * 5))
